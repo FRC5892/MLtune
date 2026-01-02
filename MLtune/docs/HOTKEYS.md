@@ -98,7 +98,7 @@ Failed to register ctrl+shift+x hotkey: [error message]
 
 1. **Linux/Mac:** Try running with elevated permissions:
    ```bash
-   sudo python -m bayesopt.tuner.main
+   sudo python -m MLtune.tuner.main
    ```
 
 2. **macOS:** Grant accessibility permissions:
@@ -113,7 +113,7 @@ If a hotkey conflicts with your system or another application:
 
 1. The tuner will show which hotkeys registered successfully at startup
 2. Use the fallback options for any hotkeys that failed to register
-3. You can modify the hotkey definitions in `bayesopt/tuner/tuner.py` if needed
+3. You can modify the hotkey definitions in `MLtune/tuner/tuner.py` if needed
 
 ---
 
@@ -146,7 +146,7 @@ When the tuner stops, all registered hotkeys are automatically removed to preven
 
 ### Customizing Hotkeys
 
-To customize hotkey combinations, edit the constants at the top of `bayesopt/tuner/tuner.py`:
+To customize hotkey combinations, edit the constants at the top of `MLtune/tuner/tuner.py`:
 
 ```python
 # Keyboard hotkeys

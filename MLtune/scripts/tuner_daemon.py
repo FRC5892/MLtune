@@ -16,12 +16,12 @@ import os
 import time
 import configparser
 
-# Add parent directory (bayesopt) to path to import tuner module
+# Add parent directory (MLtune) to path to import tuner module
 script_dir = os.path.dirname(os.path.abspath(__file__))
-bayesopt_dir = os.path.dirname(script_dir)
-sys.path.insert(0, bayesopt_dir)
+MLtune_dir = os.path.dirname(script_dir)
+sys.path.insert(0, MLtune_dir)
 
-from bayesopt.tuner import BayesianTunerCoordinator, TunerConfig, setup_logging
+from MLtune.tuner import BayesianTunerCoordinator, TunerConfig, setup_logging
 import logging
 
 

@@ -1,4 +1,4 @@
-# BayesOpt Dashboard Requirements
+# MLtune Dashboard Requirements
 
 # Core dashboard dependencies
 dash>=2.14.0

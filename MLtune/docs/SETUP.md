@@ -1,6 +1,6 @@
 # Setup Guide
 
-Complete setup instructions for the BayesOpt tuner on all platforms.
+Complete setup instructions for the MLtune tuner on all platforms.
 
 ## Table of Contents
 
@@ -41,22 +41,22 @@ You should see something like `Python 3.11.5`
 
 **Option A: Clone with Git (Recommended)**
 ```cmd
-git clone https://github.com/Ruthie-FRC/BAYESOPT.git
-cd BAYESOPT
+git clone https://github.com/Ruthie-FRC/MLtune.git
+cd MLtune
 ```
 
 **Option B: Download ZIP**
 1. Go to the GitHub repository
 2. Click the green **"Code"** button
 3. Click **"Download ZIP"**
-4. Extract to a folder (e.g., `C:\FRC\BAYESOPT`)
+4. Extract to a folder (e.g., `C:\FRC\MLtune`)
 
 ### Step 3: Install Dependencies
 
 Open Command Prompt and run:
 ```cmd
-cd C:\FRC\BAYESOPT
-pip install -r bayesopt/tuner/requirements.txt
+cd C:\FRC\MLtune
+pip install -r MLtune/tuner/requirements.txt
 ```
 
 Wait for all packages to install. This only needs to be done once.
@@ -64,19 +64,19 @@ Wait for all packages to install. This only needs to be done once.
 ### Step 4: Create Desktop Shortcut
 
 1. Open **File Explorer**
-2. Navigate to the BAYESOPT folder (e.g., `C:\FRC\BAYESOPT`)
+2. Navigate to the MLtune folder (e.g., `C:\FRC\MLtune`)
 3. **Double-click** `CREATE_DESKTOP_SHORTCUT.bat`
-4. A shortcut called **"BayesOpt Tuner"** will appear on your Desktop!
+4. A shortcut called **"MLtune Tuner"** will appear on your Desktop!
 
 ### Step 5: Run the Tuner
 
 From now on, to start the tuner:
 
 1. Make sure your laptop is connected to the robot's network
-2. **Double-click the "BayesOpt Tuner" shortcut** on your Desktop
+2. **Double-click the "MLtune Tuner" shortcut** on your Desktop
 3. A GUI window will appear showing connection status
 
-**Alternative:** You can also double-click `START_TUNER.bat` in the BAYESOPT folder.
+**Alternative:** You can also double-click `START_TUNER.bat` in the MLtune folder.
 
 ## Mac/Linux Setup
 
@@ -94,21 +94,21 @@ If you need to install Python:
 ### Step 2: Download the Code
 
 ```bash
-git clone https://github.com/Ruthie-FRC/BAYESOPT.git
-cd BAYESOPT
+git clone https://github.com/Ruthie-FRC/MLtune.git
+cd MLtune
 ```
 
 ### Step 3: Install Dependencies
 
 ```bash
-pip3 install -r bayesopt/tuner/requirements.txt
+pip3 install -r MLtune/tuner/requirements.txt
 ```
 
 Or if you have a virtual environment:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install -r bayesopt/tuner/requirements.txt
+pip install -r MLtune/tuner/requirements.txt
 ```
 
 ### Step 4: Make Start Script Executable
@@ -125,7 +125,7 @@ chmod +x START_TUNER.sh
 
 Or run directly with Python:
 ```bash
-python3 bayesopt/tuner/main.py
+python3 MLtune/tuner/main.py
 ```
 
 ## Installing Dependencies
@@ -139,7 +139,7 @@ The tuner requires these Python packages (automatically installed by requirement
 
 **If you encounter "module not found" errors:**
 ```bash
-pip install -r bayesopt/tuner/requirements.txt --upgrade
+pip install -r MLtune/tuner/requirements.txt --upgrade
 ```
 
 **On Linux, if tkinter is missing:**
@@ -158,7 +158,7 @@ sudo dnf install python3-tkinter
 To verify everything is working correctly:
 
 ```bash
-cd bayesopt/tuner
+cd MLtune/tuner
 python run_tests.py
 ```
 
@@ -183,7 +183,7 @@ If connection fails, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 After successful setup:
 
 1. **Integrate Java code:** Follow [JAVA_INTEGRATION.md](JAVA_INTEGRATION.md) to add NetworkTables support to your robot
-2. **Configure tuner:** Edit `bayesopt/config/TUNER_TOGGLES.ini` for your preferences
+2. **Configure tuner:** Edit `MLtune/config/TUNER_TOGGLES.ini` for your preferences
 3. **Learn features:** Read [USER_GUIDE.md](USER_GUIDE.md) for complete documentation
 4. **Start tuning:** See the Quick Start section in the main [README](../../README.md)
 
@@ -218,7 +218,7 @@ After successful setup:
 python --version  # or python3 --version
 
 # Reinstall dependencies
-pip install -r bayesopt/tuner/requirements.txt --force-reinstall
+pip install -r MLtune/tuner/requirements.txt --force-reinstall
 ```
 
 ### Window closes immediately (Windows)
@@ -227,8 +227,8 @@ pip install -r bayesopt/tuner/requirements.txt --force-reinstall
 
 **Solution:**
 1. Open Command Prompt
-2. Navigate to BAYESOPT folder
-3. Run manually: `python bayesopt\tuner\main.py`
+2. Navigate to MLtune folder
+3. Run manually: `python MLtune\tuner\main.py`
 4. Read the error message
 5. Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for specific error fixes
 
@@ -242,7 +242,7 @@ pip install -r bayesopt/tuner/requirements.txt --force-reinstall
 chmod +x START_TUNER.sh
 
 # Or run with Python directly
-python3 bayesopt/tuner/main.py
+python3 MLtune/tuner/main.py
 ```
 
 ## See Also

@@ -300,7 +300,7 @@ class BayesianTunerCoordinator:
         """
         Check for runtime enable/disable toggle changes from the dashboard.
         
-        This allows drivers to enable or disable the entire BayesOpt tuner
+        This allows drivers to enable or disable the entire MLtune tuner
         at runtime via the dashboard, without needing to restart the program.
         
         When disabled:
@@ -1070,7 +1070,7 @@ def run_tuner(server_ip: Optional[str] = None, config: Optional[TunerConfig] = N
                 logger.info(f"  {PREV_COEFFICIENT_HOTKEY:20s} - Previous coefficient")
             
             logger.info("=" * 60)
-            logger.info("See bayesopt/docs/HOTKEYS.md for detailed hotkey documentation")
+            logger.info("See MLtune/docs/HOTKEYS.md for detailed hotkey documentation")
             logger.info("=" * 60)
             
             # Keep running until interrupted or tuning complete

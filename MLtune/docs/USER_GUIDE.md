@@ -1,6 +1,6 @@
 # User Guide
 
-Complete guide to using the BayesOpt tuner system.
+Complete guide to using the MLtune tuner system.
 
 ## Table of Contents
 
@@ -20,14 +20,14 @@ Complete guide to using the BayesOpt tuner system.
 
 If you're using the tuner for the first time, start with **Manual Mode**:
 
-1. **Edit `bayesopt/config/TUNER_TOGGLES.ini`:**
+1. **Edit `MLtune/config/TUNER_TOGGLES.ini`:**
    ```ini
    autotune_enabled = False              # Manual optimization
    auto_advance_on_success = False       # Manual advancement
    ```
 
 2. **Start the tuner:**
-   - Double-click the "BayesOpt Tuner" Desktop shortcut
+   - Double-click the "MLtune Tuner" Desktop shortcut
    - Or run `START_TUNER.bat` (Windows) / `START_TUNER.sh` (Mac/Linux)
 
 3. **Connect to robot:**
@@ -90,7 +90,7 @@ The tuner works through coefficients in a configured order:
 
 Global settings that apply to all coefficients (unless overridden).
 
-**Location:** `bayesopt/config/TUNER_TOGGLES.ini`
+**Location:** `MLtune/config/TUNER_TOGGLES.ini`
 
 **Key settings:**
 ```ini
@@ -111,7 +111,7 @@ auto_advance_force_global = False  # True = ignore local overrides
 
 Per-coefficient settings and tuning order.
 
-**Location:** `bayesopt/config/COEFFICIENT_TUNING.py`
+**Location:** `MLtune/config/COEFFICIENT_TUNING.py`
 
 **Defines:**
 - Coefficient ranges (min/max values)

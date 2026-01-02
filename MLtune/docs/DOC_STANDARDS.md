@@ -1,6 +1,6 @@
 # Documentation Standards
 
-This document defines the conventions and standards for all documentation in the BAYESOPT project. Following these standards ensures documentation is maintainable, consistent, and easy to navigate.
+This document defines the conventions and standards for all documentation in the MLtune project. Following these standards ensures documentation is maintainable, consistent, and easy to navigate.
 
 ## Table of Contents
 
@@ -39,11 +39,11 @@ Follow these standards for:
 ### Directory Structure
 
 ```
-BAYESOPT/
+MLtune/
 ├── README.md                          # Project overview and quick start
 ├── LICENSE                            # License information
 │
-├── bayesopt/
+├── MLtune/
 │   └── docs/                          # All detailed documentation
 │       ├── DOCUMENTATION_STANDARDS.md # This file
 │       ├── USER_GUIDE.md             # Complete user documentation
@@ -57,7 +57,7 @@ BAYESOPT/
 ├── java-integration/
 │   └── README.md                      # Java files documentation
 │
-└── bayesopt/tuner/tests/
+└── MLtune/tuner/tests/
     └── README_TESTS.md                # Test suite documentation
 ```
 
@@ -66,8 +66,8 @@ BAYESOPT/
 | Category | Location | Purpose |
 |----------|----------|---------|
 | **Overview** | `/README.md` | Project introduction, quick start |
-| **User Docs** | `/bayesopt/docs/` | Setup, usage, troubleshooting |
-| **Developer Docs** | `/bayesopt/docs/` | Architecture, contributing |
+| **User Docs** | `/MLtune/docs/` | Setup, usage, troubleshooting |
+| **Developer Docs** | `/MLtune/docs/` | Architecture, contributing |
 | **Component Docs** | Within component directories | Specific component documentation |
 
 ## File Naming
@@ -189,7 +189,7 @@ Use headers consistently:
 
 **Examples:**
 ```markdown
-The **BayesOpt tuner** uses *Bayesian optimization* to tune `kDragCoefficient`.
+The **MLtune tuner** uses *Bayesian optimization* to tune `kDragCoefficient`.
 ```
 
 ### Lists
@@ -250,7 +250,7 @@ pip install -r requirements.txt
 **File content examples:**
 ```markdown
 ```python
-# Example: bayesopt/tuner/main.py
+# Example: MLtune/tuner/main.py
 if __name__ == "__main__":
     run_tuner()
 ```
@@ -297,7 +297,7 @@ if __name__ == "__main__":
 4. **Show complete, runnable examples when possible**
    ```python
    # Complete example
-   from bayesopt.tuner import Tuner
+   from MLtune.tuner import Tuner
    
    tuner = Tuner()
    tuner.start()
@@ -336,12 +336,12 @@ python script.py
 ```markdown
 **Windows:**
 ```cmd
-python bayesopt\tuner\main.py
+python MLtune\tuner\main.py
 ```
 
 **Mac/Linux:**
 ```bash
-python3 bayesopt/tuner/main.py
+python3 MLtune/tuner/main.py
 ```
 ```
 
@@ -482,7 +482,7 @@ Download Python from [python.org](https://www.python.org/).
 ### Formatting Conventions
 
 1. **File paths and names**
-   - Use code formatting: `` `bayesopt/config/TUNER_TOGGLES.ini` ``
+   - Use code formatting: `` `MLtune/config/TUNER_TOGGLES.ini` ``
 
 2. **Commands**
    - Use code blocks: `` ```bash ... ``` ``
@@ -561,7 +561,7 @@ When creating or updating documentation:
 ```markdown
 # Setup Guide
 
-Complete installation instructions for the BayesOpt tuner on all platforms.
+Complete installation instructions for the MLtune tuner on all platforms.
 
 ## Table of Contents
 
@@ -589,8 +589,8 @@ Before you begin, you need:
 ### Step 2: Clone Repository
 
 ```bash
-git clone https://github.com/Ruthie-FRC/BAYESOPT.git
-cd BAYESOPT
+git clone https://github.com/Ruthie-FRC/MLtune.git
+cd MLtune
 ```
 
 ## See Also

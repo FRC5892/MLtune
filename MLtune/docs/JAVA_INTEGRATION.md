@@ -1,6 +1,6 @@
 # Java Robot Code Integration Guide
 
-This guide explains how to integrate the BayesOpt Python tuner with your Java robot code.
+This guide explains how to integrate the MLtune Python tuner with your Java robot code.
 
 ## Ready-to-Use Java Files
 
@@ -20,7 +20,7 @@ See `java-integration/README.md` for detailed setup instructions.
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         DRIVER STATION LAPTOP                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │  BayesOpt Python App (double-click START_TUNER.bat)               │  │
+│  │  MLtune Python App (double-click START_TUNER.bat)               │  │
 │  │  • Runs Bayesian optimization calculations                        │  │
 │  │  • Displays GUI with status, logs, controls                       │  │
 │  │  • Publishes coefficient updates to NetworkTables                 │  │

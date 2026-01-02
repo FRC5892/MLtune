@@ -23,7 +23,7 @@ A Driver Station-only Bayesian optimization tuner for the FiringSolutionSolver.
 Automatically tunes shooting coefficients based on shot hit/miss feedback.
 
 Usage:
-    from bayesopt.tuner import run_tuner
+    from MLtune.tuner import run_tuner
     
     # Run with default config
     run_tuner()

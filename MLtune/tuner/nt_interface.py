@@ -63,7 +63,7 @@ try:
             NetworkTables._inst = ntcore.NetworkTableInstance.getDefault()
             if server:
                 NetworkTables._inst.setServer(server)
-            NetworkTables._inst.startClient4("BayesOptTuner")
+            NetworkTables._inst.startClient4("MLtuneTuner")
         
         @staticmethod
         def isConnected():
@@ -809,7 +809,7 @@ class NetworkTablesInterface:
         """
         Read the runtime tuner enable/disable toggle from the dashboard.
         
-        This allows drivers to enable or disable the entire BayesOpt tuner
+        This allows drivers to enable or disable the entire MLtune tuner
         at runtime via the dashboard, without needing to restart the program.
         
         The toggle works like a simple on/off switch - when the driver

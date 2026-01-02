@@ -21,8 +21,8 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from bayesopt.tuner.config import TunerConfig
-from bayesopt.tuner.tuner import BayesianTunerCoordinator
+from MLtune.tuner.config import TunerConfig
+from MLtune.tuner.tuner import BayesianTunerCoordinator
 
 
 class TunerGUI:

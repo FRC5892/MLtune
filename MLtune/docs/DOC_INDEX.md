@@ -1,6 +1,6 @@
-# BayesOpt Documentation Index
+# MLtune Documentation Index
 
-This directory contains all detailed documentation for the BAYESOPT project.
+This directory contains all detailed documentation for the MLtune project.
 
 ## Quick Navigation
 
@@ -41,7 +41,7 @@ Start here if you're new to the project:
 ### Root Level
 - **[../README.md](../../README.md)** - Project overview, quick start, and links to detailed docs
 
-### This Directory (`bayesopt/docs/`)
+### This Directory (`MLtune/docs/`)
 All detailed documentation lives here:
 - User-facing documentation (setup, usage, troubleshooting)
 - Developer documentation (architecture, contributing)
@@ -49,7 +49,7 @@ All detailed documentation lives here:
 
 ### Component-Specific
 - **[java-integration/README.md](../../java-integration/README.md)** - Java integration files documentation
-- **[bayesopt/tuner/tests/README_TESTS.md](../tuner/tests/README_TESTS.md)** - Test suite documentation
+- **[MLtune/tuner/tests/README_TESTS.md](../tuner/tests/README_TESTS.md)** - Test suite documentation
 
 ## Finding What You Need
 
