@@ -12,7 +12,7 @@ import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger; // AK logging
 
 /**
- * FiringSolver subsystem integrating Bayesian optimization tuning with robust physics calculation.
+ * FiringSolver subsystem integrating ML optimization tuning with robust physics calculation.
  * Combines NetworkTables/tuner interoperability with iterative ballistics solver.
  */
 public class FiringSolver extends SubsystemBase {
@@ -92,7 +92,7 @@ public class FiringSolver extends SubsystemBase {
   // === Shot logging ===
 
   /**
-   * Logs a shot result and solution for BayesOpt tuner analysis,
+   * Logs a shot result and solution for MLtune tuner analysis,
    * including hit/miss, measured parameters and the solver outputs.
    */
   public void logShot(

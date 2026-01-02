@@ -12,7 +12,7 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Helper class for interfacing with the BayesOpt Python tuner.
+ * Helper class for interfacing with the MLtune Python tuner.
  *
  * <p>This class provides methods to check tuner status and read dashboard controls set by the
  * tuner. Use this class to check if shooting is allowed based on tuner interlocks.

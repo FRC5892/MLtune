@@ -20,7 +20,7 @@ package frc.robot;
  * }
  * }</pre>
  *
- * <p><b>IMPORTANT:</b> These constants are NEVER modified at runtime. The BayesOpt tuner modifies
+ * <p><b>IMPORTANT:</b> These constants are NEVER modified at runtime. The MLtune tuner modifies
  * operating values stored in the FiringSolver subsystem, not these defaults.
  */
 public final class Constants {

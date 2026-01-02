@@ -1,4 +1,4 @@
-# Contributing to BayesOpt
+# Contributing to MLtune
 
 Thanks for contributing! This is an open source project made by one high schooler, so please be patient if code reviews or responses take some time.
 
@@ -50,11 +50,11 @@ Body (optional):
 feat(optimizer): reduce default learning_rate 0.01 → 0.001
 
 Changed Adam (adaptive moment estimate) default learning_rate in 
-bayesopt/optimizer.py from 0.01 → 0.001.
+MLtune/optimizer.py from 0.01 → 0.001.
 
 Why: Reduced overshooting and improved stability on noisy datasets.
 Testing: Updated tests/test_optimizer.py::test_default_lr to assert new default.
-Files: bayesopt/optimizer.py, tests/test_optimizer.py
+Files: MLtune/optimizer.py, tests/test_optimizer.py
 ```
 
 **Bad commit:**
@@ -162,11 +162,11 @@ def calculate_score(hit: bool, distance: float) -> float:
 
 ```bash
 # Python
-black bayesopt/tuner/
-flake8 bayesopt/tuner/
+black MLtune/tuner/
+flake8 MLtune/tuner/
 
 # Check formatting without changing
-black --check bayesopt/tuner/
+black --check MLtune/tuner/
 ```
 
 ## Testing
@@ -175,7 +175,7 @@ black --check bayesopt/tuner/
 
 ```bash
 # All tests
-cd bayesopt/tuner
+cd MLtune/tuner
 python run_tests.py
 
 # Specific test
@@ -263,7 +263,7 @@ What actually happened.
 ## Environment
 - Python version: 
 - OS: 
-- BayesOpt version/commit:
+- MLtune version/commit:
 - NetworkTables version:
 
 ## Logs
@@ -356,7 +356,7 @@ If you have questions about contributing:
 - Check existing documentation
 - Ask in GitHub Discussions
 
-Thank you for contributing to BayesOpt! 🎉
+Thank you for contributing to MLtune! 🎉
 
 ## See Also
 
