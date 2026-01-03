@@ -79,7 +79,6 @@ app.index_string = '''
             {%scripts%}
             {%renderer%}
         </footer>
-        <script src="/assets/js/robot_game.js"></script>
     </body>
 </html>
 '''
@@ -129,12 +128,6 @@ COEFFICIENT_CONFIG = {
     'kShooterRPM': {'step': 50, 'min': 0, 'max': 6000},
     'kExitVelocity': {'step': 0.1, 'min': 0, 'max': 30}
 }
-
-# GitHub-inspired CSS with pure white background and orange accents
-
-# Robot Game JavaScript
-
-# Inject custom CSS and JavaScript
 
 
 def create_top_nav():
@@ -252,7 +245,7 @@ def create_dashboard_view():
         ),
         
         # Main dashboard grid
-        html.Div(style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr', 'gap': '12px', '@media (max-width: 768px)': {'gridTemplateColumns': '1fr'}}, children=[
+        html.Div(className='dashboard-grid', children=[
             # Left column - Quick actions and status
             html.Div([
                 # Quick actions card
@@ -2014,29 +2007,34 @@ def handle_coefficient_sliders(slider_values, state):
 
 @app.callback(
     Output('app-state', 'data', allow_duplicate=True),
-    [Input({'type': 'fine-inc', 'index': MATCH}, 'n_clicks'),
-     Input({'type': 'fine-dec', 'index': MATCH}, 'n_clicks'),
-     Input({'type': 'fine-inc-large', 'index': MATCH}, 'n_clicks'),
-     Input({'type': 'fine-dec-large', 'index': MATCH}, 'n_clicks'),
-     Input({'type': 'reset-coeff', 'index': MATCH}, 'n_clicks')],
-    [State({'type': 'coeff-slider', 'index': MATCH}, 'value'),
-     State({'type': 'coeff-slider', 'index': MATCH}, 'id'),
-     State('app-state', 'data')],
+    [Input({'type': 'fine-inc', 'index': ALL}, 'n_clicks'),
+     Input({'type': 'fine-dec', 'index': ALL}, 'n_clicks'),
+     Input({'type': 'fine-inc-large', 'index': ALL}, 'n_clicks'),
+     Input({'type': 'fine-dec-large', 'index': ALL}, 'n_clicks'),
+     Input({'type': 'reset-coeff', 'index': ALL}, 'n_clicks')],
+    [State('app-state', 'data')],
     prevent_initial_call=True
 )
-def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks, dec_large_clicks, reset_clicks,
-                                        current_value, slider_id, state):
+def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks, dec_large_clicks, reset_clicks, state):
     """Handle fine adjustment buttons for individual coefficients."""
     ctx = callback_context
     if not ctx.triggered:
         return state
-    
+
     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    
-    # Get coefficient name from the slider ID
-    coeff_name = slider_id.get('index') if isinstance(slider_id, dict) else None
+
+    # Get coefficient name from the triggered button ID
+    try:
+        button_data = json.loads(triggered_id)
+        coeff_name = button_data.get('index')
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return state
+
+    # Validate coefficient name before using it
     if not coeff_name:
         return state
+    # Determine current value from stored state or defaults
+    current_value = state.get('coefficient_values', {}).get(coeff_name, COEFFICIENT_DEFAULTS.get(coeff_name, 0))
     
     # Use module-level configuration constants
     coeff_config = COEFFICIENT_CONFIG.get(coeff_name, {'step': 0.1, 'min': 0, 'max': 100})
@@ -2045,11 +2043,10 @@ def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks
     max_val = coeff_config['max']
     
     try:
-        button_data = json.loads(triggered_id)
         button_type = button_data.get('type')
-        
+
         new_value = current_value
-        
+
         if button_type == 'fine-inc':
             new_value = min(current_value + step, max_val)
             print(f"➕ {coeff_name}: {current_value:.4f} → {new_value:.4f} (+{step})")
@@ -2071,15 +2068,15 @@ def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks
             # Store the new value in state
             state['coefficient_values'][coeff_name] = new_value
             return state
-        
+
         # Update state with new value for all non-reset operations
         if 'coefficient_values' not in state:
             state['coefficient_values'] = {}
         state['coefficient_values'][coeff_name] = new_value
-        
+
         return state
-        
-    except (json.JSONDecodeError, KeyError, TypeError) as e:
+
+    except (KeyError, TypeError) as e:
         print(f"Error in fine adjustment: {e}")
         return state
 
@@ -2457,45 +2454,20 @@ def update_status_bar(n_intervals, state):
 
 
 if __name__ == '__main__':
-    import webbrowser
-    import threading
-    
+    import webbrowser, threading, time
+
     print("=" * 60)
     print("MLtune Dashboard Starting")
     print("=" * 60)
     print(f"Opening browser to: http://localhost:8050")
-    print(f"Tuner integration: {'Available' if TUNER_AVAILABLE else 'Demo mode'}")
     print("=" * 60)
-    
+    print(f"Tuner integration: {'Available' if TUNER_AVAILABLE else 'Demo mode'}")
+
     # Open browser after a short delay to ensure server is ready
     def open_browser():
-        import time
         time.sleep(1.5)
         webbrowser.open('http://localhost:8050')
-    
+
+    # Start the browser in a background thread
     threading.Thread(target=open_browser, daemon=True).start()
-    
-    app.run(debug=True, host='0.0.0.0', port=8050)
-
-
-if __name__ == '__main__':
-    import webbrowser
-    import threading
-    
-    print("=" * 60)
-    print("MLtune Dashboard Starting")
-    print("=" * 60)
-    print(f"Opening browser to: http://localhost:8050")
-    print(f"Tuner integration: {'Available' if TUNER_AVAILABLE else 'Demo mode'}")
-    print("=" * 60)
-    
-    # Open browser after a short delay to ensure server is ready
-    def open_browser():
-        import time
-        time.sleep(1.5)
-        webbrowser.open('http://localhost:8050')
-    
-    threading.Thread(target=open_browser, daemon=True).start()
-    
-    app.run(debug=True, host='0.0.0.0', port=8050)
-
+    app.run(debug=False, host='0.0.0.0', port=8050)

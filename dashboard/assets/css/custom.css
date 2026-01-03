@@ -417,7 +417,17 @@ select:disabled {
 }
 
 /* Responsive */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
 @media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
     .sidebar {
         transform: translateX(-100%);
     }
