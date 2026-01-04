@@ -229,7 +229,13 @@ def create_robot_disconnected_view():
                         ]),
                         html.Div([
                             html.Label("Status:", style={'fontWeight': 'bold', 'fontSize': '12px'}),
-                            html.P(html.Span("● ", style={'color': 'var(--danger)', 'fontSize': '16px'}) + "Disconnected", style={'fontSize': '14px', 'color': 'var(--danger)'})
+                            html.P(
+                                children=[
+                                    html.Span("● ", style={'color': 'var(--danger)', 'fontSize': '16px'}),
+                                    "Disconnected",
+                                ],
+                                style={'fontSize': '14px', 'color': 'var(--danger)'}
+                            )
                         ]),
                     ])
                 ], style={'backgroundColor': 'var(--bg-secondary)', 'padding': '16px', 'borderRadius': '6px', 'marginBottom': '16px'}),
