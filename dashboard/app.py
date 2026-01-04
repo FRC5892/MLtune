@@ -2261,7 +2261,7 @@ def handle_session_management(save_clicks, load_clicks, export_clicks, state):
     elif button_id == 'load-session-btn':
         print("📁 Loading Session...")
     elif button_id == 'export-session-btn':
-        print("📤 Exporting Session Data...")
+        print("Exporting Session Data...")
     
     return state
 
@@ -2288,9 +2288,9 @@ def handle_settings_buttons(save_clicks, load_clicks, reset_clicks, baseline_cli
     elif button_id == 'load-settings-btn':
         print("📁 Loading Settings...")
     elif button_id == 'reset-settings-btn':
-        print("🔄 Resetting Settings to Defaults...")
+        print("Resetting Settings to Defaults...")
     elif button_id == 'set-baseline-btn':
-        print("⭐ Setting Current Values as Baseline")
+        print("Setting Current Values as Baseline")
     
     return state
 
@@ -2336,7 +2336,7 @@ def handle_add_note(clicks, note_text, state):
         ) for note in state['notes']
     ]
     
-    print(f"📝 Added Note: {note_text}")
+    print(f"Added Note: {note_text}")
     
     return notes_elements if notes_elements else [html.P("No notes yet", style={'fontStyle': 'italic', 'color': 'var(--text-secondary)'})], ""
 
@@ -2404,29 +2404,29 @@ def handle_danger_zone_buttons(reconfig_clicks, restore_clicks, lock_clicks, exp
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
     if button_id == 'reconfigure-base-btn':
-        print("⚙️ Reconfiguring Base Point...")
+        print("Reconfiguring Base Point...")
     elif button_id == 'restore-defaults-btn':
-        print("🔄 Restoring Factory Defaults...")
+        print("Restoring Factory Defaults...")
     elif button_id == 'lock-config-btn':
         state['config_locked'] = not state.get('config_locked', False)
         status = "Locked" if state['config_locked'] else "Unlocked"
-        print(f"🔐 Configuration {status}")
+        print(f"Configuration {status}")
     elif button_id == 'export-config-btn':
-        print("📤 Exporting Configuration...")
+        print("Exporting Configuration...")
     elif button_id == 'import-config-btn':
-        print("📥 Importing Configuration...")
+        print("Importing Configuration...")
     elif button_id == 'reset-data-btn':
-        print("⚠️ Resetting All Tuning Data...")
+        print("Resetting All Tuning Data...")
         state['coefficient_values'] = {}
         state['shot_count'] = 0
         state['success_rate'] = 0.0
     elif button_id == 'clear-pinned-btn':
-        print("🧹 Clearing All Pinned Data...")
+        print("Clearing All Pinned Data...")
     elif button_id == 'emergency-stop-btn':
-        print("🔥 EMERGENCY STOP!")
+        print("EMERGENCY STOP!")
         state['tuner_enabled'] = False
     elif button_id == 'force-retune-btn':
-        print("🔄 Forcing Retune of Current Coefficient...")
+        print("Forcing Retune of Current Coefficient...")
     
     return state
 
