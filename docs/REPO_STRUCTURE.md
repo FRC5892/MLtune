@@ -5,8 +5,8 @@ Quick guide to what's where in this repository.
 ## Top-Level Folders
 
 ```
-MLtune/
-├── mltune/           ← Main tuning application (Python)
+MLTUNE/               ← Repo root 
+├── MLtune/           ← Main tuning application (Python)
 ├── dashboard/        ← Web interface for monitoring
 ├── java-integration/ ← Files to copy into your robot code
 ├── scripts/          ← Launch scripts (START.sh, START.bat, etc.)

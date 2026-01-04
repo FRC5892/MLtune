@@ -187,34 +187,56 @@ def create_sidebar():
     )
 
 
-def create_robot_game_view():
-    """Create the robot jumping game (appears when disconnected)."""
+def create_robot_disconnected_view():
+    """Create the robot disconnected status page."""
     return html.Div(
-        id='robot-game-container',
+        id='robot-disconnected-container',
         style={
             'display': 'none',  # Hidden by default, shown when disconnected
             'textAlign': 'center',
-            'padding': '50px 0'
+            'padding': '60px 20px'
         },
         children=[
-            html.Div(className="card", style={'maxWidth': '800px', 'margin': '0 auto'}, children=[
-                html.Div("Robot Runner", className="card-header", style={'fontSize': '32px'}),
-                html.P("Connection to robot lost. Press SPACE to play!", style={'fontSize': '16px', 'color': 'var(--text-secondary)'}),
-                html.Canvas(
-                    id='game-canvas',
-                    width=800,
-                    height=200,
-                    style={
-                        'border': '2px solid var(--border-default)',
-                        'borderRadius': '6px',
-                        'backgroundColor': 'var(--bg-secondary)',
-                        'display': 'block',
-                        'margin': '20px auto'
-                    }
-                ),
-                html.Div(id='game-score', children="Score: 0", style={'fontSize': '24px', 'fontWeight': 'bold', 'color': 'var(--accent-primary)'}),
-                html.P("Press SPACE to jump over obstacles!", style={'fontSize': '14px', 'marginTop': '10px'}),
-                html.P("Game automatically appears when robot is disconnected", style={'fontSize': '12px', 'color': 'var(--text-tertiary)', 'fontStyle': 'italic'}),
+            html.Div(className="card", style={'maxWidth': '600px', 'margin': '0 auto'}, children=[
+                html.Div("🤖 Robot Disconnected", className="card-header", style={'fontSize': '32px', 'color': 'var(--danger)'}),
+                html.P("Unable to connect to the robot.", style={'fontSize': '18px', 'color': 'var(--text-secondary)', 'marginTop': '16px'}),
+                html.Hr(),
+                html.Div([
+                    html.H3("Troubleshooting Steps:", style={'textAlign': 'left', 'marginBottom': '12px'}),
+                    html.Ol([
+                        html.Li("Verify the robot is powered on", style={'marginBottom': '8px'}),
+                        html.Li("Check that the NetworkTables server is running", style={'marginBottom': '8px'}),
+                        html.Li(f"Verify team number is correct in settings", style={'marginBottom': '8px'}),
+                        html.Li("Ensure the dashboard and robot are on the same network", style={'marginBottom': '8px'}),
+                        html.Li("Check firewall settings for port 5810", style={'marginBottom': '8px'}),
+                        html.Li("Review robot code logs for errors", style={'marginBottom': '0'}),
+                    ], style={'textAlign': 'left', 'paddingLeft': '20px'})
+                ], style={'backgroundColor': 'var(--bg-secondary)', 'padding': '16px', 'borderRadius': '6px', 'marginBottom': '16px'}),
+                html.Div([
+                    html.H3("Connection Status", style={'marginBottom': '12px'}),
+                    html.Div(style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr', 'gap': '12px'}, children=[
+                        html.Div([
+                            html.Label("Robot IP:", style={'fontWeight': 'bold', 'fontSize': '12px'}),
+                            html.P(id='disconnect-robot-ip', children="--", style={'fontSize': '14px', 'color': 'var(--text-secondary)'})
+                        ]),
+                        html.Div([
+                            html.Label("Last Seen:", style={'fontWeight': 'bold', 'fontSize': '12px'}),
+                            html.P(id='disconnect-last-seen', children="Never", style={'fontSize': '14px', 'color': 'var(--text-secondary)'})
+                        ]),
+                        html.Div([
+                            html.Label("Attempts:", style={'fontWeight': 'bold', 'fontSize': '12px'}),
+                            html.P(id='disconnect-attempts', children="0", style={'fontSize': '14px', 'color': 'var(--text-secondary)'})
+                        ]),
+                        html.Div([
+                            html.Label("Status:", style={'fontWeight': 'bold', 'fontSize': '12px'}),
+                            html.P(html.Span("● ", style={'color': 'var(--danger)', 'fontSize': '16px'}) + "Disconnected", style={'fontSize': '14px', 'color': 'var(--danger)'})
+                        ]),
+                    ])
+                ], style={'backgroundColor': 'var(--bg-secondary)', 'padding': '16px', 'borderRadius': '6px', 'marginBottom': '16px'}),
+                html.Div(style={'display': 'flex', 'gap': '8px', 'justifyContent': 'center'}, children=[
+                    dbc.Button("🔄 Retry Connection", id='retry-connection-btn', className="btn-primary"),
+                    dbc.Button("⚙️ Check Settings", id='open-settings-btn', className="btn-secondary"),
+                ])
             ])
         ]
     )
@@ -224,7 +246,7 @@ def create_dashboard_view():
     """Create the main dashboard view with quick actions."""
     return html.Div([
         # Robot game (shown when disconnected)
-        create_robot_game_view(),
+        create_robot_disconnected_view(),
         
         # Breadcrumb navigation
         html.Div(className="breadcrumb", children=[
@@ -1549,7 +1571,10 @@ app.layout = html.Div(
         html.Div(
             id='main-content',
             className="main-content",
-            children=[create_dashboard_view()]
+            children=[
+                create_robot_disconnected_view(),
+                create_dashboard_view()
+            ]
         ),
         
         # Bottom status bar with real-time info
@@ -1695,14 +1720,14 @@ def dismiss_banner(n_clicks):
 
 
 @app.callback(
-    Output('robot-game-container', 'style'),
+    Output('robot-disconnected-container', 'style'),
     [Input('update-interval', 'n_intervals')],
     [State('app-state', 'data')]
 )
-def toggle_robot_game(n_intervals, state):
-    """Show robot game when disconnected from robot."""
+def toggle_robot_disconnected(n_intervals, state):
+    """Show disconnected page when robot is not connected."""
     if state.get('connection_status') == 'disconnected':
-        return {'display': 'block', 'textAlign': 'center', 'padding': '50px 0'}
+        return {'display': 'block', 'textAlign': 'center', 'padding': '60px 20px'}
     return {'display': 'none'}
 
 
@@ -1792,11 +1817,7 @@ def start_tour(n_clicks, state):
                     html.Li("Robot status monitoring"),
                     html.Li("Advanced ML features"),
                     html.Li("Keyboard shortcuts"),
-                ]),
-                html.Div(style={'marginTop': '30px', 'display': 'flex', 'gap': '10px'}, children=[
-                    dbc.Button("Start Tour", className="btn-primary", size="lg", href="#", style={'flex': '1'}),
-                    dbc.Button("Skip Tour", className="btn-secondary", size="lg", href="#", style={'flex': '1'}),
-                ])
+                ], style={'marginTop': '10px', 'marginBottom': '0'})
             ])
         ])
     ])
