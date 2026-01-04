@@ -3,7 +3,7 @@
 ## Development Setup
 
 ```bash
-git clone https://github.com/Ruthie-FRC/MLtune.git
+git clone https://github.com/FRC5892/MLtune.git
 cd MLtune
 python3 -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
@@ -14,7 +14,7 @@ pip install -r dashboard/requirements.txt
 ## Project Structure
 
 ```
-src/
+MLTUNE/
 ├── mltune/
 │   ├── tuner/          # Core tuning system
 │   │   ├── config.py   # Configuration loading
