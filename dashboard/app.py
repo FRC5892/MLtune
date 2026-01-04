@@ -251,7 +251,7 @@ def create_robot_disconnected_view():
 def create_dashboard_view():
     """Create the main dashboard view with quick actions."""
     return html.Div([
-        # Robot game (shown when disconnected)
+        # Robot disconnected status view (shown when disconnected)
         create_robot_disconnected_view(),
         
         # Breadcrumb navigation
