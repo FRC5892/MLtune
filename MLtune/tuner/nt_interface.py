@@ -171,6 +171,9 @@ class NetworkTablesInterface:
         self.tuning_table = None
         self.firing_solver_table = None
         
+        # Cache for frequently accessed subtables
+        self._table_cache = {}
+        
         # Last shot data
         self.last_shot_timestamp = 0.0
         self.last_shot_data: Optional[ShotData] = None
@@ -257,6 +260,8 @@ class NetworkTablesInterface:
         try:
             # NetworkTables doesn't have an explicit stop in pynetworktables
             self.connected = False
+            # Clear cached tables on disconnect
+            self._table_cache.clear()
             logger.info("Stopped NetworkTables connection")
         except Exception as e:
             logger.error(f"Error during stop: {e}")
@@ -268,6 +273,20 @@ class NetworkTablesInterface:
         Deprecated: Use stop() instead for API consistency.
         """
         self.stop()
+    
+    def _get_cached_table(self, table_path: str):
+        """
+        Get a NetworkTables table with caching to reduce overhead.
+        
+        Args:
+            table_path: Path to the table (e.g., "/Tuning/BayesianTuner")
+            
+        Returns:
+            NetworkTables table object
+        """
+        if table_path not in self._table_cache:
+            self._table_cache[table_path] = NetworkTables.getTable(table_path)
+        return self._table_cache[table_path]
     
     def read_coefficient(self, nt_key: str, default_value: float) -> float:
         """
@@ -572,8 +591,11 @@ class NetworkTablesInterface:
             return False
         
         try:
-            # Read from the BayesianTuner table where dashboard controls live
-            tuner_table = NetworkTables.getTable("/Tuning/BayesianTuner")
+            # Use cached table lookup to avoid repeated getTable() calls
+            if '/Tuning/BayesianTuner' not in self._table_cache:
+                self._table_cache['/Tuning/BayesianTuner'] = NetworkTables.getTable("/Tuning/BayesianTuner")
+            tuner_table = self._table_cache['/Tuning/BayesianTuner']
+            
             button_pressed = tuner_table.getBoolean("RunOptimization", False)
             
             if button_pressed:
