@@ -59,6 +59,9 @@ public final class Constants {
     /** Default spin factor for Magnus effect. Adjust based on how spin affects your game piece. */
     public static final double kDefaultSpinFactor = 0.0;
 
+    /** Default maximum exit velocity in m/s. Limits the maximum velocity the solver can suggest. */
+    public static final double kDefaultMaxExitVelocity = 25.0;
+
     // ========== PHYSICAL LIMITS (NOT TUNED - used for validation) ==========
 
     /** Maximum shooting distance in meters. */
