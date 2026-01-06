@@ -8,21 +8,24 @@
     "terminal.integrated.profiles.linux": {
         "bash": {
             "path": "bash",
-            "args": ["--init-file", "${workspaceFolder}/activate_venv.sh"]
+            "args": ["--init-file", "${workspaceFolder}/scripts/activate_venv.sh"]
         }
     },
     "terminal.integrated.profiles.osx": {
         "bash": {
             "path": "bash",
-            "args": ["--init-file", "${workspaceFolder}/activate_venv.sh"]
+            "args": ["--init-file", "${workspaceFolder}/scripts/activate_venv.sh"]
         }
     },
     "terminal.integrated.profiles.windows": {
         "PowerShell": {
             "source": "PowerShell",
-            "args": ["-NoExit", "-File", "${workspaceFolder}\\activate_venv.ps1"]
+            "args": ["-NoExit", "-File", "${workspaceFolder}\\scripts\\activate_venv.ps1"]
         }
     },
     "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "python.analysis.extraPaths": [
+        "./MLtune/tuner"
+    ]
 }

@@ -187,45 +187,14 @@ def create_sidebar():
     )
 
 
-def create_robot_game_view():
-    """Create the robot jumping game (appears when disconnected)."""
-    return html.Div(
-        id='robot-game-container',
-        style={
-            'display': 'none',  # Hidden by default, shown when disconnected
-            'textAlign': 'center',
-            'padding': '50px 0'
-        },
-        children=[
-            html.Div(className="card", style={'maxWidth': '800px', 'margin': '0 auto'}, children=[
-                html.Div("Robot Runner", className="card-header", style={'fontSize': '32px'}),
-                html.P("Connection to robot lost. Press SPACE to play!", style={'fontSize': '16px', 'color': 'var(--text-secondary)'}),
-                html.Canvas(
-                    id='game-canvas',
-                    width=800,
-                    height=200,
-                    style={
-                        'border': '2px solid var(--border-default)',
-                        'borderRadius': '6px',
-                        'backgroundColor': 'var(--bg-secondary)',
-                        'display': 'block',
-                        'margin': '20px auto'
-                    }
-                ),
-                html.Div(id='game-score', children="Score: 0", style={'fontSize': '24px', 'fontWeight': 'bold', 'color': 'var(--accent-primary)'}),
-                html.P("Press SPACE to jump over obstacles!", style={'fontSize': '14px', 'marginTop': '10px'}),
-                html.P("Game automatically appears when robot is disconnected", style={'fontSize': '12px', 'color': 'var(--text-tertiary)', 'fontStyle': 'italic'}),
-            ])
-        ]
-    )
+# Robot game view removed
+
 
 
 def create_dashboard_view():
     """Create the main dashboard view with quick actions."""
     return html.Div([
-        # Robot game (shown when disconnected)
-        create_robot_game_view(),
-        
+
         # Breadcrumb navigation
         html.Div(className="breadcrumb", children=[
             html.Span("Home", className="breadcrumb-item"),
@@ -957,9 +926,10 @@ def create_settings_view():
                         "Set Current as Baseline", 
                         id='set-baseline-btn', 
                         className="btn-primary",
-                        style={'width': '100%', 'padding': '12px'}
+                        style={'width': '100%', 'padding': '12px'},
+                        n_clicks=0
                     ),
-                    html.Small(id='baseline-recommendation', children="", style={'display': 'block', 'marginTop': '8px', 'color': 'var(--text-secondary)', 'fontStyle': 'italic'})
+                    html.Small(id='baseline-recommendation', children='', style={'display': 'block', 'marginTop': '8px', 'color': 'var(--text-secondary)', 'fontStyle': 'italic'})
                 ])
             ])
         ]),
@@ -1334,35 +1304,35 @@ def create_robot_status_view():
                 html.Tbody([
                     html.Tr([
                         html.Td("Left Drive Motor"),
-                        html.Td(html.Span("●", style={'color': 'var(--success)'}) + " OK"),
+                        html.Td([html.Span("●", style={'color': 'var(--success)'}), " OK"]),
                         html.Td("42°C"),
                         html.Td("3.2A"),
                         html.Td("0"),
                     ]),
                     html.Tr([
                         html.Td("Right Drive Motor"),
-                        html.Td(html.Span("●", style={'color': 'var(--success)'}) + " OK"),
+                        html.Td([html.Span("●", style={'color': 'var(--success)'}), " OK"]),
                         html.Td("41°C"),
                         html.Td("3.1A"),
                         html.Td("0"),
                     ]),
                     html.Tr([
                         html.Td("Shooter Motor"),
-                        html.Td(html.Span("●", style={'color': 'var(--warning)'}) + " Warm"),
+                        html.Td([html.Span("●", style={'color': 'var(--warning)'}), " Warm"]),
                         html.Td("58°C"),
                         html.Td("12.4A"),
                         html.Td("0"),
                     ]),
                     html.Tr([
                         html.Td("Intake Motor"),
-                        html.Td(html.Span("●", style={'color': 'var(--success)'}) + " OK"),
+                        html.Td([html.Span("●", style={'color': 'var(--success)'}), " OK"]),
                         html.Td("38°C"),
                         html.Td("2.1A"),
                         html.Td("0"),
                     ]),
                     html.Tr([
                         html.Td("Pneumatics"),
-                        html.Td(html.Span("●", style={'color': 'var(--danger)'}) + " No Data"),
+                        html.Td([html.Span("●", style={'color': 'var(--danger)'}), " No Data"]),
                         html.Td("--"),
                         html.Td("--"),
                         html.Td("1"),
@@ -1526,19 +1496,13 @@ def create_help_view():
             html.P("Features: GitHub-inspired design, two-level mode system, keyboard shortcuts, and complete runtime control over all tuner settings.")
         ]),
         
-        html.Div(className="card", children=[
-            html.Div("Robot Runner Game", className="card-header"),
-            html.P("When the robot is disconnected, a fun jumping game automatically appears!"),
-            html.P("Press SPACE to jump over obstacles. Score points and challenge yourself during downtime."),
-            html.P(html.Em("Like Chrome's dino game, but with a robot!"), style={'color': 'var(--text-secondary)'})
-        ])
     ])
 
 
 # Main layout
 app.layout = html.Div(
     id='root-container',
-    **{'data-theme': 'light'},  # Default theme, updated by callback
+    **{'data-theme': 'light'},  # Default theme, updated by callback # type: ignore
     children=[
         dcc.Store(id='app-state', data=app_state),
         dcc.Interval(id='update-interval', interval=1000),  # Update every second
@@ -1602,25 +1566,38 @@ app.layout = html.Div(
 @app.callback(
     Output('main-content', 'children'),
     Output('main-content', 'className'),
+    Output({'type': 'nav-btn', 'index': ALL}, 'className'),
     [Input({'type': 'nav-btn', 'index': ALL}, 'n_clicks')],
     [State('sidebar', 'className')]
 )
 def update_view(clicks, sidebar_class):
-    """Update the main content view based on sidebar navigation."""
+    """Update the main content view based on sidebar navigation and mark the active sidebar item."""
     ctx = callback_context
+    # Default view is 'dashboard'
+    default_view = 'dashboard'
+
+    # Sidebar button indices in the same order as create_sidebar
+    nav_indices = ['dashboard', 'coefficients', 'workflow', 'graphs', 'settings', 'robot', 'notes', 'danger', 'logs', 'help']
+
     if not ctx.triggered:
-        return create_dashboard_view(), 'main-content'
+        content = create_dashboard_view()
+        class_name = 'main-content expanded' if 'collapsed' in (sidebar_class or '') else 'main-content'
+        nav_classes = ['sidebar-menu-item active' if idx == default_view else 'sidebar-menu-item' for idx in nav_indices]
+        return content, class_name, nav_classes
     
     # Determine which button was clicked
     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
     if triggered_id == '':
-        return create_dashboard_view(), 'main-content'
+        content = create_dashboard_view()
+        class_name = 'main-content expanded' if 'collapsed' in (sidebar_class or '') else 'main-content'
+        nav_classes = ['sidebar-menu-item active' if idx == default_view else 'sidebar-menu-item' for idx in nav_indices]
+        return content, class_name, nav_classes
     
     try:
         button_data = json.loads(triggered_id)
-        view = button_data.get('index', 'dashboard')
+        view = button_data.get('index', default_view)
     except (json.JSONDecodeError, KeyError, TypeError):
-        return create_dashboard_view(), 'main-content'
+        view = default_view
     
     # Map view to content - use lazy evaluation to avoid errors
     try:
@@ -1643,7 +1620,10 @@ def update_view(clicks, sidebar_class):
         print(f"Error rendering view {view}: {e}")
         content = create_dashboard_view()
     
-    class_name = 'main-content expanded' if 'collapsed' in sidebar_class else 'main-content'
+    class_name = 'main-content expanded' if 'collapsed' in (sidebar_class or '') else 'main-content'
+    nav_classes = ['sidebar-menu-item active' if idx == view else 'sidebar-menu-item' for idx in nav_indices]
+
+    return content, class_name, nav_classes
     
     return content, class_name
 
@@ -1694,16 +1674,6 @@ def dismiss_banner(n_clicks):
     return {'display': 'flex'}
 
 
-@app.callback(
-    Output('robot-game-container', 'style'),
-    [Input('update-interval', 'n_intervals')],
-    [State('app-state', 'data')]
-)
-def toggle_robot_game(n_intervals, state):
-    """Show robot game when disconnected from robot."""
-    if state.get('connection_status') == 'disconnected':
-        return {'display': 'block', 'textAlign': 'center', 'padding': '50px 0'}
-    return {'display': 'none'}
 
 
 @app.callback(
@@ -1794,8 +1764,8 @@ def start_tour(n_clicks, state):
                     html.Li("Keyboard shortcuts"),
                 ]),
                 html.Div(style={'marginTop': '30px', 'display': 'flex', 'gap': '10px'}, children=[
-                    dbc.Button("Start Tour", className="btn-primary", size="lg", href="#", style={'flex': '1'}),
-                    dbc.Button("Skip Tour", className="btn-secondary", size="lg", href="#", style={'flex': '1'}),
+                    dbc.Button("Start Tour", className="btn-primary", size="lg", style={'flex': '1'}),
+                    dbc.Button("Skip Tour", className="btn-secondary", size="lg", style={'flex': '1'}),
                 ])
             ])
         ])
@@ -2470,4 +2440,4 @@ if __name__ == '__main__':
 
     # Start the browser in a background thread
     threading.Thread(target=open_browser, daemon=True).start()
-    app.run(debug=False, host='0.0.0.0', port=8050)
+    app.run(debug=True, host='0.0.0.0', port=8050)

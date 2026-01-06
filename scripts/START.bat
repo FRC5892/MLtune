@@ -16,6 +16,7 @@ echo.
 REM Get the directory where this script is located
 set "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%"
+cd ..
 
 REM Check if Python is available
 where python >nul 2>nul

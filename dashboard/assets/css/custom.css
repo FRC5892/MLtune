@@ -140,6 +140,19 @@ body {
     border-left-width: 4px;
 }
 
+/* When sidebar is collapsed, show an active indicator on the right so the selection is still visible */
+.sidebar.collapsed .sidebar-menu-item.active {
+    border-left-color: transparent;
+    border-right: 4px solid var(--accent-primary);
+    padding-left: var(--space-md);
+}
+
+/* Keep hover effect consistent for active items */
+.sidebar-menu-item.active:hover {
+    background-color: var(--accent-subtle);
+    color: var(--accent-primary);
+}
+
 /* Main Content */
 .main-content {
     margin-left: 240px;
@@ -441,11 +454,6 @@ select:disabled {
     }
 }
 
-/* Robot Game Styles */
-#robot-game-container canvas {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-}
 
 /* Status Bar at Bottom */
 .status-bar {
