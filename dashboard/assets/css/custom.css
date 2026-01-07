@@ -105,6 +105,13 @@ body {
     width: 64px;
 }
 
+/* Keep toggle button visible and centered when sidebar is collapsed */
+.sidebar.collapsed #sidebar-toggle {
+    position: absolute;
+    left: 184px; /* 176px offset + 8px margin to center in the visible 64px area */
+    top: 8px;
+}
+
 .sidebar-menu-item {
     padding: var(--space-sm) var(--space-md);
     color: var(--text-primary);
@@ -554,5 +561,4 @@ input[type="range"]::-moz-range-progress {
 .checklist-input {
     accent-color: var(--accent-primary) !important;
 }
-
 
