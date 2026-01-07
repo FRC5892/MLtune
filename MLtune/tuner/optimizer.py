@@ -422,7 +422,6 @@ class CoefficientTuner:
         This is called when:
         - User presses the "Skip to Next Coefficient" button
         - Auto-advance triggers after 100% success rate
-        - User presses Ctrl+Shift+Right hotkey
         
         Skips current coefficient without requiring convergence.
         """
@@ -449,7 +448,6 @@ class CoefficientTuner:
         Go back to the previous coefficient in the tuning order.
         
         This is called when:
-        - User presses Ctrl+Shift+Left hotkey
         - User wants to re-tune a coefficient
         
         Returns to previous coefficient for re-tuning.
