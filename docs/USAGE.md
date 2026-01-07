@@ -57,16 +57,6 @@ server_ip = 10.12.34.2
 - Automatic advancement on success
 - Set both toggles to `True`
 
-## Keyboard Shortcuts
-
-The system registers global hotkeys (requires administrator/root privileges on some systems):
-
-- `Ctrl+Alt+R` - Trigger optimization
-- `Ctrl+Alt+N` - Advance to next coefficient
-- `Ctrl+Alt+S` - Toggle tuning
-
-Note: Keyboard support varies by platform. Use dashboard controls if hotkeys are unavailable.
-
 ## Web Dashboard
 
 Access the dashboard at http://localhost:8050.
@@ -92,15 +82,6 @@ The dashboard updates automatically when new data is received from the robot.
 - Confirm team number in configuration
 - Check network connection to robot
 
-### Hotkey Failures
-
-**Symptom**: Keyboard shortcuts not responding
-
-**Solutions**:
-- Run application with elevated privileges
-- Use dashboard controls as alternative
-- Note: The `keyboard` library has platform-specific limitations
-
 ### Import Errors
 
 **Symptom**: Module import failures
@@ -123,7 +104,7 @@ The dashboard updates automatically when new data is received from the robot.
 - Begin with wide parameter bounds, then narrow based on initial results
 - Collect 10-20 shots per coefficient for reliable optimization
 - Monitor application logs for system status
-- Dashboard provides more reliable control than hotkeys on most platforms
+- Use the dashboard for all control operations
 - Back up optimized coefficients before parameter resets
 
 ## Logging
