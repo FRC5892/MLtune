@@ -129,6 +129,24 @@ COEFFICIENT_CONFIG = {
     'kExitVelocity': {'step': 0.1, 'min': 0, 'max': 30}
 }
 
+# Ordered list of coefficient names for consistent iteration
+COEFFICIENT_NAMES = list(COEFFICIENT_DEFAULTS.keys())
+
+
+def clamp_coefficient_value(value, coeff_name):
+    """
+    Clamp a coefficient value to its configured min/max bounds.
+    
+    Args:
+        value: The value to clamp
+        coeff_name: The name of the coefficient (e.g., 'kDragCoefficient')
+        
+    Returns:
+        The clamped value within valid bounds
+    """
+    config = COEFFICIENT_CONFIG.get(coeff_name, {'min': 0, 'max': 100})
+    return max(config['min'], min(value, config['max']))
+
 
 def create_top_nav():
     """Create the top navigation bar."""
@@ -149,13 +167,13 @@ def create_top_nav():
                             html.Div("No robot", style={'fontSize': '11px', 'color': 'var(--text-tertiary)'})
                         ])
                     ]),
-                    # Mode toggle
+                    # Dark mode toggle
                     dbc.Button(
-                        "Switch to Advanced",
-                        id='mode-toggle',
+                        "🌙 Dark Mode",
+                        id='theme-toggle',
                         className="btn-secondary",
                         size="sm",
-                        title="Switch between Normal and Advanced modes"
+                        title="Toggle between light and dark theme"
                     ),
                 ]
             )
@@ -202,17 +220,6 @@ def create_dashboard_view():
             html.Span("Dashboard", className="breadcrumb-item active"),
         ]),
         
-        # Dismissible banner
-        html.Div(
-            id='keyboard-banner',
-            className="banner",
-            children=[
-                html.Span("Tip: Press ? to view all keyboard shortcuts for faster control"),
-                dbc.Button("✕", id='dismiss-banner', size="sm", className="btn-secondary", style={'marginLeft': 'auto'})
-            ],
-            style={'display': 'none' if app_state['banner_dismissed'] else 'flex'}
-        ),
-        
         # Main dashboard grid
         html.Div(className='dashboard-grid', children=[
             # Left column - Quick actions and status
@@ -222,10 +229,10 @@ def create_dashboard_view():
                     html.Div("Quick Actions", className="card-header"),
                     html.P("Start tuning with a single click", style={'fontSize': '14px', 'color': 'var(--text-secondary)', 'marginBottom': '12px'}),
                     html.Div(style={'display': 'flex', 'flexDirection': 'column', 'gap': '8px'}, children=[
-                        dbc.Button("Start Tuner (Ctrl+S)", id='start-tuner-btn', className="btn-primary", style={'width': '100%', 'padding': '10px'}),
-                        dbc.Button("Stop Tuner (Ctrl+Q)", id='stop-tuner-btn', className="btn-danger", style={'width': '100%', 'padding': '10px'}),
-                        dbc.Button("Run Optimization (Ctrl+O)", id='run-optimization-btn', className="btn-primary", style={'width': '100%', 'padding': '10px'}),
-                        dbc.Button("Skip Coefficient (Ctrl+K)", id='skip-coefficient-btn', className="btn-secondary", style={'width': '100%', 'padding': '10px'}),
+                        dbc.Button("Start Tuner", id='start-tuner-btn', className="btn-primary", style={'width': '100%', 'padding': '10px'}),
+                        dbc.Button("Stop Tuner", id='stop-tuner-btn', className="btn-danger", style={'width': '100%', 'padding': '10px'}),
+                        dbc.Button("Run Optimization", id='run-optimization-btn', className="btn-primary", style={'width': '100%', 'padding': '10px'}),
+                        dbc.Button("Skip Coefficient", id='skip-coefficient-btn', className="btn-secondary", style={'width': '100%', 'padding': '10px'}),
                     ])
                 ]),
                 
@@ -260,8 +267,8 @@ def create_dashboard_view():
                     html.Div("Coefficient Navigation", className="card-header"),
                     html.P("Navigate between coefficients", style={'fontSize': '14px', 'color': 'var(--text-secondary)', 'marginBottom': '12px'}),
                     html.Div(style={'display': 'flex', 'gap': '8px'}, children=[
-                        dbc.Button("◀ Previous (Ctrl+←)", id='prev-coeff-btn', className="btn-secondary", style={'flex': '1', 'padding': '10px'}),
-                        dbc.Button("Next ▶ (Ctrl+→)", id='next-coeff-btn', className="btn-secondary", style={'flex': '1', 'padding': '10px'}),
+                        dbc.Button("◀ Previous", id='prev-coeff-btn', className="btn-secondary", style={'flex': '1', 'padding': '10px'}),
+                        dbc.Button("Next ▶", id='next-coeff-btn', className="btn-secondary", style={'flex': '1', 'padding': '10px'}),
                     ])
                 ]),
                 
@@ -270,13 +277,9 @@ def create_dashboard_view():
                     html.Div("Fine Tuning Controls", className="card-header"),
                     html.P("Adjust current coefficient in small increments", style={'fontSize': '14px', 'color': 'var(--text-secondary)', 'marginBottom': '12px'}),
                     html.Div(style={'display': 'flex', 'flexDirection': 'column', 'gap': '8px', 'alignItems': 'center'}, children=[
-                        dbc.Button("⬆ Up (Ctrl+↑)", id='fine-tune-up-btn', className="btn-secondary", style={'width': '160px', 'padding': '8px'}),
-                        html.Div(style={'display': 'flex', 'gap': '8px', 'justifyContent': 'center', 'width': '100%'}, children=[
-                            dbc.Button("← Left", id='fine-tune-left-btn', className="btn-secondary", style={'padding': '8px 12px'}),
-                            dbc.Button("Reset", id='fine-tune-reset-btn', className="btn-secondary", style={'padding': '8px 16px'}),
-                            dbc.Button("Right ➡", id='fine-tune-right-btn', className="btn-secondary", style={'padding': '8px 12px'}),
-                        ]),
-                        dbc.Button("⬇ Down (Ctrl+↓)", id='fine-tune-down-btn', className="btn-secondary", style={'width': '160px', 'padding': '8px'}),
+                        dbc.Button("⬆ Up", id='fine-tune-up-btn', className="btn-secondary", style={'width': '160px', 'padding': '8px'}),
+                        dbc.Button("Reset", id='fine-tune-reset-btn', className="btn-secondary", style={'width': '160px', 'padding': '8px'}),
+                        dbc.Button("⬇ Down", id='fine-tune-down-btn', className="btn-secondary", style={'width': '160px', 'padding': '8px'}),
                     ])
                 ]),
             ]),
@@ -317,7 +320,9 @@ def create_coefficients_view():
                 html.Div(style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center', 'marginBottom': '12px'}, children=[
                     html.Div([
                         html.Span(coeff, style={'fontWeight': 'bold', 'fontSize': '16px'}),
-                        html.Span(f" (Current: {params['default']})", style={'color': 'var(--text-secondary)', 'fontSize': '14px', 'marginLeft': '8px'}),
+                        html.Span(f" (Current: ", style={'color': 'var(--text-secondary)', 'fontSize': '14px', 'marginLeft': '8px'}),
+                        html.Span(f"{params['default']}", id={'type': 'coeff-current-display', 'index': coeff}, style={'color': 'var(--text-secondary)', 'fontSize': '14px'}),
+                        html.Span(")", style={'color': 'var(--text-secondary)', 'fontSize': '14px'}),
                     ]),
                     html.Div(style={'display': 'flex', 'gap': '4px'}, children=[
                         dbc.Button("⭐", id={'type': 'pin-coeff-btn', 'index': coeff}, size="sm", className="btn-secondary", title="Pin this value"),
@@ -1552,8 +1557,9 @@ app.layout = html.Div(
         # Hidden div for keyboard shortcut modal
         dbc.Modal(
             id='shortcuts-modal',
+            is_open=False,
             children=[
-                dbc.ModalHeader("Keyboard Shortcuts"),
+                dbc.ModalHeader(dbc.ModalTitle("Keyboard Shortcuts"), close_button=True),
                 dbc.ModalBody(create_help_view()),
             ],
             size='lg'
@@ -1624,8 +1630,6 @@ def update_view(clicks, sidebar_class):
     nav_classes = ['sidebar-menu-item active' if idx == view else 'sidebar-menu-item' for idx in nav_indices]
 
     return content, class_name, nav_classes
-    
-    return content, class_name
 
 
 @app.callback(
@@ -1646,32 +1650,39 @@ def toggle_sidebar(n_clicks, current_class):
 @app.callback(
     [Output('app-state', 'data'),
      Output('root-container', 'data-theme')],
-    [Input('mode-toggle', 'n_clicks')],
-    [State('app-state', 'data')]
+    [Input('update-interval', 'n_intervals'),
+     Input('theme-toggle', 'n_clicks')],  # Add theme toggle input
+    [State('app-state', 'data')],
+    prevent_initial_call=True
 )
-def update_app_state(mode_clicks, state):
-    """Update application state."""
+def update_app_state(n_intervals, theme_clicks, state):
+    """Update application state and handle theme toggle."""
     ctx = callback_context
-    if not ctx.triggered:
-        return state, 'light'
     
-    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    # Check if theme toggle was clicked
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        if button_id == 'theme-toggle':
+            # Toggle theme
+            current_theme = state.get('theme', 'light')
+            new_theme = 'dark' if current_theme == 'light' else 'light'
+            state['theme'] = new_theme
+            return state, new_theme
     
-    if button_id == 'mode-toggle':
-        state['mode'] = 'advanced' if state['mode'] == 'normal' else 'normal'
-    
-    return state, 'light'  # Always return light theme
+    # Return current theme
+    return state, state.get('theme', 'light')
 
 
 @app.callback(
-    Output('keyboard-banner', 'style'),
-    [Input('dismiss-banner', 'n_clicks')]
+    Output('theme-toggle', 'children'),
+    [Input('app-state', 'data')]
 )
-def dismiss_banner(n_clicks):
-    """Dismiss the keyboard shortcuts banner."""
-    if n_clicks:
-        return {'display': 'none'}
-    return {'display': 'flex'}
+def update_theme_toggle_label(state):
+    """Update the theme toggle button label based on current theme."""
+    if state.get('theme', 'light') == 'light':
+        return "🌙 Dark Mode"
+    else:
+        return "☀️ Light Mode"
 
 
 
@@ -1844,13 +1855,11 @@ def handle_coefficient_navigation(prev_clicks, next_clicks, state):
     Output('app-state', 'data', allow_duplicate=True),
     [Input('fine-tune-up-btn', 'n_clicks'),
      Input('fine-tune-down-btn', 'n_clicks'),
-     Input('fine-tune-left-btn', 'n_clicks'),
-     Input('fine-tune-right-btn', 'n_clicks'),
      Input('fine-tune-reset-btn', 'n_clicks')],
     [State('app-state', 'data')],
     prevent_initial_call=True
 )
-def handle_fine_tuning_buttons(up_clicks, down_clicks, left_clicks, right_clicks, reset_clicks, state):
+def handle_fine_tuning_buttons(up_clicks, down_clicks, reset_clicks, state):
     """Handle fine tuning control buttons."""
     ctx = callback_context
     if not ctx.triggered:
@@ -1862,10 +1871,6 @@ def handle_fine_tuning_buttons(up_clicks, down_clicks, left_clicks, right_clicks
         print("⬆️ Fine Tune Up")
     elif button_id == 'fine-tune-down-btn':
         print("⬇️ Fine Tune Down")
-    elif button_id == 'fine-tune-left-btn':
-        print("⬅️ Fine Tune Left")
-    elif button_id == 'fine-tune-right-btn':
-        print("➡️ Fine Tune Right")
     elif button_id == 'fine-tune-reset-btn':
         print("🔄 Fine Tune Reset")
     
@@ -1905,40 +1910,33 @@ def handle_coefficient_bulk_actions(increase_clicks, decrease_clicks, reset_clic
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
-    # Current values
+    # Current values in the same order as COEFFICIENT_NAMES
     current_values = [drag_val, grav_val, shot_val, target_val, angle_val, rpm_val, velocity_val]
     
     if button_id == 'increase-all-btn':
         print("⬆️ Increasing All Coefficients by 10%")
-        # Increase all coefficient values by 10%
-        new_values = [v * 1.1 for v in current_values]
+        # Increase all coefficient values by 10%, clamping to max
+        new_values = [clamp_coefficient_value(v * 1.1, name) for v, name in zip(current_values, COEFFICIENT_NAMES)]
         return new_values + [state]
         
     elif button_id == 'decrease-all-btn':
         print("⬇️ Decreasing All Coefficients by 10%")
-        # Decrease all coefficient values by 10%
-        new_values = [v * 0.9 for v in current_values]
+        # Decrease all coefficient values by 10%, clamping to min
+        new_values = [clamp_coefficient_value(v * 0.9, name) for v, name in zip(current_values, COEFFICIENT_NAMES)]
         return new_values + [state]
         
     elif button_id == 'reset-all-coeff-btn':
         print("🔄 Resetting All Coefficients to Defaults")
-        # Reset all coefficients to defaults
+        # Reset all coefficients to defaults using COEFFICIENT_NAMES for consistent ordering
         state['coefficient_values'] = {}
-        default_values = [COEFFICIENT_DEFAULTS['kDragCoefficient'], COEFFICIENT_DEFAULTS['kGravity'], COEFFICIENT_DEFAULTS['kShotHeight'],
-                         COEFFICIENT_DEFAULTS['kTargetHeight'], COEFFICIENT_DEFAULTS['kShooterAngle'], COEFFICIENT_DEFAULTS['kShooterRPM'],
-                         COEFFICIENT_DEFAULTS['kExitVelocity']]
+        default_values = [COEFFICIENT_DEFAULTS[name] for name in COEFFICIENT_NAMES]
         return default_values + [state]
         
     elif button_id == 'copy-coeff-btn':
         print("📋 Copied Current Coefficient Values")
         # Log current values (in real implementation, would copy to clipboard)
-        print(f"  kDragCoefficient: {drag_val}")
-        print(f"  kGravity: {grav_val}")
-        print(f"  kShotHeight: {shot_val}")
-        print(f"  kTargetHeight: {target_val}")
-        print(f"  kShooterAngle: {angle_val}")
-        print(f"  kShooterRPM: {rpm_val}")
-        print(f"  kExitVelocity: {velocity_val}")
+        for name, value in zip(COEFFICIENT_NAMES, current_values):
+            print(f"  {name}: {value}")
         return current_values + [state]
     
     return current_values + [state]
@@ -1976,20 +1974,35 @@ def handle_coefficient_sliders(slider_values, state):
 
 
 @app.callback(
-    Output('app-state', 'data', allow_duplicate=True),
+    [Output({'type': 'coeff-slider', 'index': 'kDragCoefficient'}, 'value', allow_duplicate=True),
+     Output({'type': 'coeff-slider', 'index': 'kGravity'}, 'value', allow_duplicate=True),
+     Output({'type': 'coeff-slider', 'index': 'kShotHeight'}, 'value', allow_duplicate=True),
+     Output({'type': 'coeff-slider', 'index': 'kTargetHeight'}, 'value', allow_duplicate=True),
+     Output({'type': 'coeff-slider', 'index': 'kShooterAngle'}, 'value', allow_duplicate=True),
+     Output({'type': 'coeff-slider', 'index': 'kShooterRPM'}, 'value', allow_duplicate=True),
+     Output({'type': 'coeff-slider', 'index': 'kExitVelocity'}, 'value', allow_duplicate=True),
+     Output('app-state', 'data', allow_duplicate=True)],
     [Input({'type': 'fine-inc', 'index': ALL}, 'n_clicks'),
      Input({'type': 'fine-dec', 'index': ALL}, 'n_clicks'),
      Input({'type': 'fine-inc-large', 'index': ALL}, 'n_clicks'),
      Input({'type': 'fine-dec-large', 'index': ALL}, 'n_clicks'),
      Input({'type': 'reset-coeff', 'index': ALL}, 'n_clicks')],
-    [State('app-state', 'data')],
+    [State({'type': 'coeff-slider', 'index': 'kDragCoefficient'}, 'value'),
+     State({'type': 'coeff-slider', 'index': 'kGravity'}, 'value'),
+     State({'type': 'coeff-slider', 'index': 'kShotHeight'}, 'value'),
+     State({'type': 'coeff-slider', 'index': 'kTargetHeight'}, 'value'),
+     State({'type': 'coeff-slider', 'index': 'kShooterAngle'}, 'value'),
+     State({'type': 'coeff-slider', 'index': 'kShooterRPM'}, 'value'),
+     State({'type': 'coeff-slider', 'index': 'kExitVelocity'}, 'value'),
+     State('app-state', 'data')],
     prevent_initial_call=True
 )
-def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks, dec_large_clicks, reset_clicks, state):
+def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks, dec_large_clicks, reset_clicks, 
+                                        drag_val, grav_val, shot_val, target_val, angle_val, rpm_val, velocity_val, state):
     """Handle fine adjustment buttons for individual coefficients."""
     ctx = callback_context
     if not ctx.triggered:
-        return state
+        return no_update
 
     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
@@ -1998,13 +2011,21 @@ def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks
         button_data = json.loads(triggered_id)
         coeff_name = button_data.get('index')
     except (json.JSONDecodeError, KeyError, TypeError):
-        return state
+        return no_update
 
     # Validate coefficient name before using it
     if not coeff_name:
-        return state
-    # Determine current value from stored state or defaults
-    current_value = state.get('coefficient_values', {}).get(coeff_name, COEFFICIENT_DEFAULTS.get(coeff_name, 0))
+        return no_update
+    
+    # Get current values in order
+    current_slider_values = [drag_val, grav_val, shot_val, target_val, angle_val, rpm_val, velocity_val]
+    
+    # Find the index of this coefficient
+    if coeff_name not in COEFFICIENT_NAMES:
+        return no_update
+    
+    coeff_index = COEFFICIENT_NAMES.index(coeff_name)
+    current_value = current_slider_values[coeff_index]
     
     # Use module-level configuration constants
     coeff_config = COEFFICIENT_CONFIG.get(coeff_name, {'step': 0.1, 'min': 0, 'max': 100})
@@ -2032,23 +2053,22 @@ def handle_coefficient_fine_adjustments(inc_clicks, dec_clicks, inc_large_clicks
         elif button_type == 'reset-coeff':
             new_value = COEFFICIENT_DEFAULTS.get(coeff_name, current_value)
             print(f"🔄 Reset {coeff_name}: {current_value:.4f} → {new_value:.4f} (default)")
-            # Remove from state overrides when resetting to default
-            if 'coefficient_values' in state and coeff_name in state['coefficient_values']:
-                del state['coefficient_values'][coeff_name]
-            # Store the new value in state
-            state['coefficient_values'][coeff_name] = new_value
-            return state
-
-        # Update state with new value for all non-reset operations
+        
+        # Update the specific coefficient value
+        new_slider_values = current_slider_values.copy()
+        new_slider_values[coeff_index] = new_value
+        
+        # Store the new value in state
         if 'coefficient_values' not in state:
             state['coefficient_values'] = {}
         state['coefficient_values'][coeff_name] = new_value
-
-        return state
-
-    except (KeyError, TypeError) as e:
-        print(f"Error in fine adjustment: {e}")
-        return state
+        
+        # Return all slider values plus state
+        return new_slider_values + [state]
+        
+    except Exception as e:
+        print(f"Error in coefficient fine adjustment: {e}")
+        return no_update
 
 
 @app.callback(
@@ -2072,6 +2092,46 @@ def handle_jump_to_buttons(clicks, state):
             print(f"⤵️ Jumped to {coeff_name}")
         except (json.JSONDecodeError, KeyError, TypeError):
             pass
+    
+    return state
+
+
+@app.callback(
+    Output('app-state', 'data', allow_duplicate=True),
+    [Input({'type': 'pin-coeff-btn', 'index': ALL}, 'n_clicks')],
+    [State({'type': 'coeff-slider', 'index': ALL}, 'value'),
+     State('app-state', 'data')],
+    prevent_initial_call=True
+)
+def handle_pin_coefficient_buttons(clicks, slider_values, state):
+    """Handle pin coefficient star buttons to save current values."""
+    ctx = callback_context
+    if not ctx.triggered or not any(clicks):
+        return state
+    
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    if triggered_id:
+        try:
+            button_data = json.loads(triggered_id)
+            coeff_name = button_data.get('index')
+            
+            # Find the index of this coefficient in COEFFICIENT_NAMES
+            if coeff_name in COEFFICIENT_NAMES:
+                coeff_index = COEFFICIENT_NAMES.index(coeff_name)
+                current_value = slider_values[coeff_index]
+                
+                # Store pinned value in state
+                if 'pinned_values' not in state:
+                    state['pinned_values'] = {}
+                
+                state['pinned_values'][coeff_name] = {
+                    'value': current_value,
+                    'timestamp': datetime.now().strftime('%I:%M:%S %p')
+                }
+                
+                print(f"📌 Pinned {coeff_name} = {current_value}")
+        except (json.JSONDecodeError, KeyError, TypeError, IndexError) as e:
+            print(f"Error pinning coefficient: {e}")
     
     return state
 
@@ -2381,18 +2441,6 @@ def handle_danger_zone_buttons(reconfig_clicks, restore_clicks, lock_clicks, exp
 
 
 @app.callback(
-    Output('mode-toggle', 'children'),
-    [Input('app-state', 'data')]
-)
-def update_mode_toggle_label(state):
-    """Update the mode toggle button label based on current mode."""
-    if state.get('mode', 'normal') == 'normal':
-        return "Switch to Advanced"
-    else:
-        return "Switch to Normal"
-
-
-@app.callback(
     [Output('coeff-display', 'children'),
      Output('shot-display', 'children'),
      Output('success-display', 'children')],
@@ -2409,6 +2457,7 @@ def update_dashboard_displays(state):
 
 @app.callback(
     [Output('status-bar-time', 'children'),
+     Output('status-bar-date', 'children'),
      Output('status-bar-shots', 'children'),
      Output('status-bar-success', 'children')],
     [Input('update-interval', 'n_intervals')],
@@ -2416,15 +2465,92 @@ def update_dashboard_displays(state):
 )
 def update_status_bar(n_intervals, state):
     """Update the status bar with current time and stats."""
-    current_time = datetime.now().strftime('%I:%M:%S %p')
+    # Use JavaScript on client side for accurate local time
+    # For now, we'll return empty and handle with clientside callback
     shots = str(state.get('shot_count', 0))
     success = f"{state.get('success_rate', 0.0):.1%}"
     
-    return current_time, shots, success
+    # Return placeholders for time/date - will be updated by clientside callback
+    return no_update, no_update, shots, success
+
+
+# Clientside callback to update time/date with user's local timezone
+app.clientside_callback(
+    """
+    function(n_intervals) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        return [timeStr, dateStr];
+    }
+    """,
+    [Output('status-bar-time', 'children', allow_duplicate=True),
+     Output('status-bar-date', 'children', allow_duplicate=True)],
+    [Input('update-interval', 'n_intervals')],
+    prevent_initial_call=True
+)
+
+
+# Simple callback to ensure the modal can be closed (the close button should work automatically with is_open=False)
+# This is a placeholder - keyboard shortcuts would require clientside callbacks
+@app.callback(
+    Output('shortcuts-modal', 'is_open'),
+    [Input({'type': 'nav-btn', 'index': 'help'}, 'n_clicks')],
+    [State('shortcuts-modal', 'is_open')],
+    prevent_initial_call=True
+)
+def toggle_shortcuts_modal(n_clicks, is_open):
+    """Toggle the shortcuts modal when help button is clicked."""
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    [Output({'type': 'coeff-current-display', 'index': 'kDragCoefficient'}, 'children'),
+     Output({'type': 'coeff-current-display', 'index': 'kGravity'}, 'children'),
+     Output({'type': 'coeff-current-display', 'index': 'kShotHeight'}, 'children'),
+     Output({'type': 'coeff-current-display', 'index': 'kTargetHeight'}, 'children'),
+     Output({'type': 'coeff-current-display', 'index': 'kShooterAngle'}, 'children'),
+     Output({'type': 'coeff-current-display', 'index': 'kShooterRPM'}, 'children'),
+     Output({'type': 'coeff-current-display', 'index': 'kExitVelocity'}, 'children')],
+    [Input({'type': 'coeff-slider', 'index': 'kDragCoefficient'}, 'value'),
+     Input({'type': 'coeff-slider', 'index': 'kGravity'}, 'value'),
+     Input({'type': 'coeff-slider', 'index': 'kShotHeight'}, 'value'),
+     Input({'type': 'coeff-slider', 'index': 'kTargetHeight'}, 'value'),
+     Input({'type': 'coeff-slider', 'index': 'kShooterAngle'}, 'value'),
+     Input({'type': 'coeff-slider', 'index': 'kShooterRPM'}, 'value'),
+     Input({'type': 'coeff-slider', 'index': 'kExitVelocity'}, 'value')],
+    prevent_initial_call=False
+)
+def update_coefficient_current_displays(drag_val, grav_val, shot_val, target_val, angle_val, rpm_val, velocity_val):
+    """Update the 'Current:' value displays in coefficient headers when sliders change."""
+    # Format each value appropriately based on its type
+    def format_value(val, coeff_name):
+        config = COEFFICIENT_CONFIG.get(coeff_name, {})
+        step = config.get('step', 0.1)
+        # If step is very small, show more decimal places
+        if step < 0.01:
+            return f"{val:.4f}"
+        elif step < 1:
+            return f"{val:.2f}"
+        else:
+            return f"{val:.0f}"
+    
+    return (
+        format_value(drag_val, 'kDragCoefficient'),
+        format_value(grav_val, 'kGravity'),
+        format_value(shot_val, 'kShotHeight'),
+        format_value(target_val, 'kTargetHeight'),
+        format_value(angle_val, 'kShooterAngle'),
+        format_value(rpm_val, 'kShooterRPM'),
+        format_value(velocity_val, 'kExitVelocity')
+    )
 
 
 if __name__ == '__main__':
     import webbrowser, threading, time
+    import os
 
     print("=" * 60)
     print("MLtune Dashboard Starting")
@@ -2440,4 +2566,7 @@ if __name__ == '__main__':
 
     # Start the browser in a background thread
     threading.Thread(target=open_browser, daemon=True).start()
-    app.run(debug=True, host='0.0.0.0', port=8050)
+    
+    # Use debug mode only in development, not in production
+    debug_mode = os.environ.get('DASH_DEBUG', 'false').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=8050)
