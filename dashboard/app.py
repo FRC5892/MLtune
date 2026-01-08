@@ -314,7 +314,7 @@ def create_coefficients_view():
         
         # Individual coefficient cards with full controls
         html.Div([
-            html.Div(className="card", style={'marginBottom': '12px', 'backgroundColor': 'var(--accent-subtle)' if coeff == 'kDragCoefficient' else 'var(--bg-primary)'}, children=[
+            html.Div(id={'type': 'coeff-card', 'index': coeff}, className="card", style={'marginBottom': '12px'}, children=[
                 # Header row with coefficient name and jump button
                 html.Div(style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center', 'marginBottom': '12px'}, children=[
                     html.Div([
@@ -469,46 +469,21 @@ def create_graphs_view():
                 dcc.Graph(
                     id='chart-success-rate',
                     figure=go.Figure(
-                        data=[
-                            go.Scatter(
-                                x=[1,2,3,4,5,6,7,8,9,10],
-                                y=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.78, 0.8, 0.82, 0.85],
-                                mode='lines+markers',
-                                name='Success Rate',
-                                line={'color': '#FF8C00', 'width': 3},
-                                marker={'size': 8},
-                                customdata=[
-                                    ['Drag: 0.003', 'Gravity: 9.81', 'Height: 1.0', 'Target: 2.4', 'Angle: 45', 'RPM: 5000', 'Velocity: 15'],
-                                    ['Drag: 0.0032', 'Gravity: 9.80', 'Height: 1.02', 'Target: 2.4', 'Angle: 46', 'RPM: 5100', 'Velocity: 15.2'],
-                                    ['Drag: 0.0035', 'Gravity: 9.81', 'Height: 1.05', 'Target: 2.4', 'Angle: 47', 'RPM: 5200', 'Velocity: 15.5'],
-                                    ['Drag: 0.0038', 'Gravity: 9.82', 'Height: 1.08', 'Target: 2.4', 'Angle: 48', 'RPM: 5300', 'Velocity: 15.8'],
-                                    ['Drag: 0.0040', 'Gravity: 9.81', 'Height: 1.10', 'Target: 2.4', 'Angle: 49', 'RPM: 5400', 'Velocity: 16.0'],
-                                    ['Drag: 0.0042', 'Gravity: 9.80', 'Height: 1.12', 'Target: 2.4', 'Angle: 50', 'RPM: 5500', 'Velocity: 16.2'],
-                                    ['Drag: 0.0043', 'Gravity: 9.81', 'Height: 1.14', 'Target: 2.4', 'Angle: 50', 'RPM: 5550', 'Velocity: 16.3'],
-                                    ['Drag: 0.0044', 'Gravity: 9.81', 'Height: 1.15', 'Target: 2.4', 'Angle: 51', 'RPM: 5600', 'Velocity: 16.4'],
-                                    ['Drag: 0.0045', 'Gravity: 9.81', 'Height: 1.16', 'Target: 2.4', 'Angle: 51', 'RPM: 5650', 'Velocity: 16.5'],
-                                    ['Drag: 0.0046', 'Gravity: 9.81', 'Height: 1.17', 'Target: 2.4', 'Angle: 52', 'RPM: 5700', 'Velocity: 16.6'],
-                                ],
-                                hovertemplate='<b>Shot %{x}</b><br>' +
-                                             'Success Rate: %{y:.1%}<br><br>' +
-                                             '<b>Coefficients:</b><br>' +
-                                             '%{customdata[0]}<br>' +
-                                             '%{customdata[1]}<br>' +
-                                             '%{customdata[2]}<br>' +
-                                             '%{customdata[3]}<br>' +
-                                             '%{customdata[4]}<br>' +
-                                             '%{customdata[5]}<br>' +
-                                             '%{customdata[6]}<br>' +
-                                             '<extra></extra>'
-                            )
-                        ],
+                        data=[],
                         layout=go.Layout(
-                            xaxis={'title': 'Shot Number', 'gridcolor': '#e8e8e8'},
-                            yaxis={'title': 'Success Rate', 'range': [0, 1], 'gridcolor': '#e8e8e8'},
-                            template='plotly_white',
+                            xaxis={'title': 'Shot Number'},
+                            yaxis={'title': 'Success Rate', 'range': [0, 1]},
+                            template='plotly',
                             hovermode='closest',
-                            plot_bgcolor='white',
-                            paper_bgcolor='white'
+                            annotations=[{
+                                'text': 'No shot data available - Start tuning to see results',
+                                'xref': 'paper',
+                                'yref': 'paper',
+                                'x': 0.5,
+                                'y': 0.5,
+                                'showarrow': False,
+                                'font': {'size': 14}
+                            }]
                         )
                     )
                 )
@@ -520,20 +495,22 @@ def create_graphs_view():
                 dcc.Graph(
                     id='chart-coeff-history',
                     figure=go.Figure(
-                        data=[
-                            go.Scatter(x=[1,2,3,4,5], y=[0.003, 0.0035, 0.004, 0.0045, 0.0042], 
-                                      mode='lines+markers', name='kDragCoefficient', line={'color': '#FF8C00'}),
-                            go.Scatter(x=[1,2,3,4,5], y=[9.81, 9.8, 9.82, 9.81, 9.81], 
-                                      mode='lines+markers', name='kGravity', line={'color': '#0969da'}),
-                            go.Scatter(x=[1,2,3,4,5], y=[1.0, 1.05, 1.1, 1.08, 1.09], 
-                                      mode='lines+markers', name='kShotHeight', line={'color': '#1a7f37'}),
-                        ],
+                        data=[],
                         layout=go.Layout(
                             xaxis={'title': 'Iteration'},
                             yaxis={'title': 'Coefficient Value'},
-                            template='plotly_white',
+                            template='plotly',
                             hovermode='x unified',
-                            legend={'orientation': 'h', 'y': -0.2}
+                            legend={'orientation': 'h', 'y': -0.2},
+                            annotations=[{
+                                'text': 'No coefficient history - Start tuning to track changes',
+                                'xref': 'paper',
+                                'yref': 'paper',
+                                'x': 0.5,
+                                'y': 0.5,
+                                'showarrow': False,
+                                'font': {'size': 14}
+                            }]
                         )
                     )
                 )
@@ -545,19 +522,20 @@ def create_graphs_view():
                 dcc.Graph(
                     id='chart-optimization-progress',
                     figure=go.Figure(
-                        data=[
-                            go.Bar(
-                                x=['kDragCoefficient', 'kGravity', 'kShotHeight', 'kTargetHeight', 'kShooterAngle', 'kShooterRPM', 'kExitVelocity'],
-                                y=[90, 85, 75, 60, 40, 20, 10],
-                                marker={'color': ['#1a7f37', '#1a7f37', '#1a7f37', '#9a6700', '#FF8C00', '#cf222e', '#cf222e']},
-                                text=['90%', '85%', '75%', '60%', '40%', '20%', '10%'],
-                                textposition='auto'
-                            )
-                        ],
+                        data=[],
                         layout=go.Layout(
                             xaxis={'title': 'Coefficient'},
                             yaxis={'title': 'Optimization Progress (%)', 'range': [0, 100]},
-                            template='plotly_white'
+                            template='plotly',
+                            annotations=[{
+                                'text': 'No optimization data - Run tuning to see progress',
+                                'xref': 'paper',
+                                'yref': 'paper',
+                                'x': 0.5,
+                                'y': 0.5,
+                                'showarrow': False,
+                                'font': {'size': 14}
+                            }]
                         )
                     )
                 )
@@ -569,26 +547,20 @@ def create_graphs_view():
                 dcc.Graph(
                     id='chart-shot-distribution',
                     figure=go.Figure(
-                        data=[
-                            go.Scatter(
-                                x=[1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0],
-                                y=[2.3, 2.4, 2.5, 2.5, 2.6, 2.5, 2.4, 2.3, 2.2],
-                                mode='markers',
-                                marker={
-                                    'size': 15,
-                                    'color': [1, 1, 1, 0, 1, 1, 0, 1, 1],
-                                    'colorscale': [[0, '#cf222e'], [1, '#1a7f37']],
-                                    'showscale': True,
-                                    'colorbar': {'title': 'Hit/Miss'}
-                                },
-                                text=['Hit', 'Hit', 'Hit', 'Miss', 'Hit', 'Hit', 'Miss', 'Hit', 'Hit'],
-                                hovertemplate='Distance: %{x}m<br>Height: %{y}m<br>%{text}<extra></extra>'
-                            )
-                        ],
+                        data=[],
                         layout=go.Layout(
                             xaxis={'title': 'Shot Distance (m)'},
                             yaxis={'title': 'Target Height (m)'},
-                            template='plotly_white'
+                            template='plotly',
+                            annotations=[{
+                                'text': 'No shot data available',
+                                'xref': 'paper',
+                                'yref': 'paper',
+                                'x': 0.5,
+                                'y': 0.5,
+                                'showarrow': False,
+                                'font': {'size': 14}
+                            }]
                         )
                     )
                 )
@@ -600,19 +572,20 @@ def create_graphs_view():
                 dcc.Graph(
                     id='chart-algorithm-comparison',
                     figure=go.Figure(
-                        data=[
-                            go.Bar(
-                                x=['GP', 'RF', 'GBRT', 'ET', 'NN'],
-                                y=[0.85, 0.82, 0.80, 0.78, 0.75],
-                                marker={'color': '#FF8C00'},
-                                text=['85%', '82%', '80%', '78%', '75%'],
-                                textposition='auto'
-                            )
-                        ],
+                        data=[],
                         layout=go.Layout(
                             xaxis={'title': 'Algorithm'},
                             yaxis={'title': 'Success Rate', 'range': [0, 1]},
-                            template='plotly_white'
+                            template='plotly',
+                            annotations=[{
+                                'text': 'No algorithm comparison data available',
+                                'xref': 'paper',
+                                'yref': 'paper',
+                                'x': 0.5,
+                                'y': 0.5,
+                                'showarrow': False,
+                                'font': {'size': 14}
+                            }]
                         )
                     )
                 )
@@ -624,26 +597,19 @@ def create_graphs_view():
                 dcc.Graph(
                     id='chart-convergence',
                     figure=go.Figure(
-                        data=[
-                            go.Scatter(
-                                x=list(range(1, 31)),
-                                y=[0.5, 0.48, 0.45, 0.43, 0.40, 0.38, 0.36, 0.35, 0.34, 0.33,
-                                   0.32, 0.31, 0.30, 0.29, 0.285, 0.28, 0.275, 0.27, 0.268, 0.266,
-                                   0.265, 0.264, 0.263, 0.262, 0.261, 0.260, 0.260, 0.260, 0.260, 0.260],
-                                mode='lines+markers',
-                                name='Best Value',
-                                line={'color': '#1a7f37', 'width': 2}
-                            )
-                        ],
+                        data=[],
                         layout=go.Layout(
                             xaxis={'title': 'Iteration'},
                             yaxis={'title': 'Objective Function Value'},
-                            template='plotly_white',
+                            template='plotly',
                             annotations=[{
-                                'x': 25, 'y': 0.260,
-                                'text': 'Converged',
-                                'showarrow': True,
-                                'arrowhead': 2
+                                'text': 'No convergence data available',
+                                'xref': 'paper',
+                                'yref': 'paper',
+                                'x': 0.5,
+                                'y': 0.5,
+                                'showarrow': False,
+                                'font': {'size': 14}
                             }]
                         )
                     )
@@ -678,7 +644,7 @@ def create_graphs_view():
                         layout=go.Layout(
                             xaxis={'title': 'Shooter Angle'},
                             yaxis={'title': 'Distance'},
-                            template='plotly_white'
+                            template='plotly'
                         )
                     )
                 )
@@ -702,7 +668,7 @@ def create_graphs_view():
                         layout=go.Layout(
                             xaxis={'title': 'Exit Velocity (m/s)'},
                             yaxis={'title': 'Frequency'},
-                            template='plotly_white',
+                            template='plotly',
                             showlegend=False
                         )
                     )
@@ -836,7 +802,7 @@ def create_workflow_view():
             html.Div("Tuning Session Management", className="card-header"),
             html.Div([
                 html.Label("Session Name:", style={'fontWeight': 'bold'}),
-                dbc.Input(type="text", value="Competition Practice 2024", id='session-name', placeholder="Enter session name"),
+                dbc.Input(type="text", value=f"Tuning session {datetime.now().strftime('%m/%d/%Y at %H:%M')}", id='session-name', placeholder="Enter session name"),
                 html.Br(),
                 html.Label("Session Notes:", style={'fontWeight': 'bold'}),
                 dbc.Textarea(id='session-notes', placeholder="Notes about this tuning session...", style={'height': '100px'}),
@@ -1227,21 +1193,22 @@ def create_robot_status_view():
             dcc.Graph(
                 id='robot-battery-graph',
                 figure=go.Figure(
-                    data=[
-                        go.Scatter(
-                            x=list(range(60)),
-                            y=[12.4 + (i % 10) * 0.01 for i in range(60)],
-                            mode='lines',
-                            name='Battery Voltage',
-                            line={'color': '#1a7f37', 'width': 2}
-                        )
-                    ],
+                    data=[],
                     layout=go.Layout(
                         title='Battery Voltage (Last 60s)',
                         xaxis={'title': 'Time (seconds ago)', 'autorange': 'reversed'},
                         yaxis={'title': 'Voltage (V)', 'range': [11, 13]},
-                        template='plotly_white',
-                        height=300
+                        template='plotly',
+                        height=300,
+                        annotations=[{
+                            'text': 'No data available - Robot disconnected',
+                            'xref': 'paper',
+                            'yref': 'paper',
+                            'x': 0.5,
+                            'y': 0.5,
+                            'showarrow': False,
+                            'font': {'size': 14}
+                        }]
                     )
                 )
             ),
@@ -1250,18 +1217,22 @@ def create_robot_status_view():
             dcc.Graph(
                 id='robot-resources-graph',
                 figure=go.Figure(
-                    data=[
-                        go.Scatter(x=list(range(60)), y=[30 + (i % 20) for i in range(60)], 
-                                  mode='lines', name='CPU %', line={'color': '#0969da'}),
-                        go.Scatter(x=list(range(60)), y=[50 + (i % 15) for i in range(60)], 
-                                  mode='lines', name='Memory %', line={'color': '#9a6700'}),
-                    ],
+                    data=[],
                     layout=go.Layout(
                         title='CPU & Memory Usage (Last 60s)',
                         xaxis={'title': 'Time (seconds ago)', 'autorange': 'reversed'},
                         yaxis={'title': 'Usage (%)', 'range': [0, 100]},
-                        template='plotly_white',
-                        height=300
+                        template='plotly',
+                        height=300,
+                        annotations=[{
+                            'text': 'No data available - Robot disconnected',
+                            'xref': 'paper',
+                            'yref': 'paper',
+                            'x': 0.5,
+                            'y': 0.5,
+                            'showarrow': False,
+                            'font': {'size': 14}
+                        }]
                     )
                 )
             ),
@@ -1689,11 +1660,11 @@ def update_view(clicks, sidebar_class):
 def toggle_sidebar(n_clicks, current_class):
     """Toggle sidebar collapsed state."""
     if n_clicks:
-        if 'collapsed' in current_class:
+        if current_class and 'collapsed' in current_class:
             return 'sidebar'
         else:
             return 'sidebar collapsed'
-    return current_class
+    return current_class or 'sidebar'
 
 
 @app.callback(
@@ -2056,7 +2027,7 @@ def handle_jump_to_buttons(clicks, state):
     prevent_initial_call=True
 )
 def handle_pin_coefficient_buttons(clicks, slider_values, state):
-    """Handle pin coefficient buttons to save current values."""
+    """Handle pin coefficient buttons to toggle pin/unpin for current values."""
     ctx = callback_context
     if not ctx.triggered or not any(clicks):
         return state
@@ -2072,18 +2043,22 @@ def handle_pin_coefficient_buttons(clicks, slider_values, state):
                 coeff_index = COEFFICIENT_NAMES.index(coeff_name)
                 current_value = slider_values[coeff_index]
                 
-                # Store pinned value in state
+                # Initialize pinned_values if needed
                 if 'pinned_values' not in state:
                     state['pinned_values'] = {}
                 
-                state['pinned_values'][coeff_name] = {
-                    'value': current_value,
-                    'timestamp': datetime.now().strftime('%I:%M:%S %p')
-                }
-                
-                print(f"📌 Pinned {coeff_name} = {current_value}")
+                # Toggle: if already pinned, unpin it; otherwise pin it
+                if coeff_name in state['pinned_values']:
+                    del state['pinned_values'][coeff_name]
+                    print(f"🔓 Unpinned {coeff_name}")
+                else:
+                    state['pinned_values'][coeff_name] = {
+                        'value': current_value,
+                        'timestamp': datetime.now().strftime('%I:%M:%S %p')
+                    }
+                    print(f"📌 Pinned {coeff_name} = {current_value}")
         except (json.JSONDecodeError, KeyError, TypeError, IndexError) as e:
-            print(f"Error pinning coefficient: {e}")
+            print(f"Error toggling pin for coefficient: {e}")
     
     return state
 
@@ -2115,9 +2090,12 @@ def update_pinned_values_display(state):
                             html.Span(coeff_name, style={'fontWeight': 'bold', 'marginRight': '8px'}),
                             html.Span(f"= {pin_data['value']}", style={'color': 'var(--accent-primary)', 'fontWeight': 'bold'}),
                         ]),
-                        html.Div([
+                        html.Div(style={'display': 'flex', 'gap': '8px', 'alignItems': 'center'}, children=[
                             html.Small(f"Pinned at {pin_data['timestamp']}", 
-                                     style={'fontSize': '11px', 'color': 'var(--text-secondary)'})
+                                     style={'fontSize': '11px', 'color': 'var(--text-secondary)', 'marginRight': '8px'}),
+                            dbc.Button("🗑️", id={'type': 'unpin-coeff-btn', 'index': coeff_name}, 
+                                     size="sm", className="btn-secondary", title="Unpin this coefficient",
+                                     style={'padding': '2px 8px', 'fontSize': '12px'})
                         ])
                     ])
                 ]
@@ -2125,6 +2103,93 @@ def update_pinned_values_display(state):
         )
     
     return pinned_cards
+
+
+@app.callback(
+    Output('app-state', 'data', allow_duplicate=True),
+    [Input({'type': 'unpin-coeff-btn', 'index': ALL}, 'n_clicks')],
+    [State('app-state', 'data')],
+    prevent_initial_call=True
+)
+def handle_unpin_coefficient_buttons(clicks, state):
+    """Handle unpin buttons to remove individual pinned coefficients."""
+    ctx = callback_context
+    if not ctx.triggered or not any(clicks):
+        return state
+    
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    if triggered_id:
+        try:
+            button_data = json.loads(triggered_id)
+            coeff_name = button_data.get('index')
+            
+            # Remove from pinned values if it exists
+            if 'pinned_values' in state and coeff_name in state['pinned_values']:
+                del state['pinned_values'][coeff_name]
+                print(f"🗑️ Unpinned {coeff_name}")
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            print(f"Error unpinning coefficient: {e}")
+    
+    return state
+
+
+@app.callback(
+    [Output({'type': 'pin-coeff-btn', 'index': MATCH}, 'children'),
+     Output({'type': 'pin-coeff-btn', 'index': MATCH}, 'style'),
+     Output({'type': 'pin-coeff-btn', 'index': MATCH}, 'title')],
+    [Input('app-state', 'data')],
+    [State({'type': 'pin-coeff-btn', 'index': MATCH}, 'id')],
+    prevent_initial_call=False
+)
+def update_pin_button_appearance(state, button_id):
+    """Update pin button appearance based on whether coefficient is pinned."""
+    # Safely get coefficient name from button_id
+    if not button_id or not isinstance(button_id, dict):
+        return "📌", {}, "Click to pin this value"
+    
+    coeff_name = button_id.get('index')
+    if not coeff_name:
+        return "📌", {}, "Click to pin this value"
+    
+    pinned_values = state.get('pinned_values', {})
+    
+    if coeff_name in pinned_values:
+        # Coefficient is pinned - show as orange/pinned
+        # Using inline style since we can't access CSS variables in style dict
+        return "📌", {
+            'backgroundColor': '#ff6b35',  # Orange accent color
+            'borderColor': '#ff6b35',
+            'color': 'white',
+            'fontWeight': 'bold'
+        }, f"Click to unpin {coeff_name}"
+    else:
+        # Coefficient is not pinned - show as default gray
+        return "📌", {}, "Click to pin this value"
+
+
+@app.callback(
+    Output({'type': 'coeff-card', 'index': MATCH}, 'style'),
+    [Input('app-state', 'data')],
+    [State({'type': 'coeff-card', 'index': MATCH}, 'id')],
+    prevent_initial_call=False
+)
+def update_coefficient_card_highlight(state, card_id):
+    """Update coefficient card background to highlight the currently active coefficient."""
+    if not card_id or not isinstance(card_id, dict):
+        return {'marginBottom': '12px'}
+    
+    coeff_name = card_id.get('index')
+    if not coeff_name:
+        return {'marginBottom': '12px'}
+    
+    current_coeff = state.get('current_coefficient', 'kDragCoefficient')
+    
+    if coeff_name == current_coeff:
+        # Highlight the current coefficient
+        return {'marginBottom': '12px', 'backgroundColor': 'var(--accent-subtle)'}
+    else:
+        # Default background
+        return {'marginBottom': '12px', 'backgroundColor': 'var(--bg-primary)'}
 
 
 @app.callback(
@@ -2422,6 +2487,7 @@ def handle_danger_zone_buttons(reconfig_clicks, restore_clicks, lock_clicks, exp
         state['success_rate'] = 0.0
     elif button_id == 'clear-pinned-btn':
         print("🧹 Clearing All Pinned Data...")
+        state['pinned_values'] = {}
     elif button_id == 'emergency-stop-btn':
         print("🔥 EMERGENCY STOP!")
         state['tuner_enabled'] = False
@@ -2444,6 +2510,44 @@ def update_dashboard_displays(state):
     success = state.get('success_rate', 0.0)
     
     return coeff, str(shots), f"{success:.1%}"
+
+
+@app.callback(
+    [Output('robot-battery', 'children'),
+     Output('robot-battery', 'style'),
+     Output('robot-cpu', 'children'),
+     Output('robot-cpu', 'style'),
+     Output('robot-memory', 'children'),
+     Output('robot-memory', 'style'),
+     Output('robot-can', 'children'),
+     Output('robot-can', 'style'),
+     Output('robot-loop-time', 'children'),
+     Output('robot-loop-time', 'style')],
+    [Input('app-state', 'data')]
+)
+def update_robot_status_displays(state):
+    """Update robot status displays - clear when disconnected."""
+    connection_status = state.get('connection_status', 'disconnected')
+    
+    if connection_status == 'disconnected' or not connection_status or connection_status == '':
+        # Robot is disconnected - show N/A for all values
+        na_style = {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--text-secondary)'}
+        return (
+            "N/A", na_style,
+            "N/A", na_style,
+            "N/A", na_style,
+            "N/A", na_style,
+            "N/A", na_style
+        )
+    else:
+        # Robot is connected - show actual values (placeholder for now)
+        return (
+            "12.4V", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'},
+            "34%", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--info)'},
+            "128MB", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--info)'},
+            "42%", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'},
+            "18ms", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'}
+        )
 
 
 @app.callback(
