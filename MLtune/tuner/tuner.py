@@ -960,4 +960,5 @@ def run_tuner(server_ip: Optional[str] = None, config: Optional[TunerConfig] = N
         except KeyboardInterrupt:
             logger.info("Interrupted by user (Ctrl+C)")
         finally:
+            pass
                             
