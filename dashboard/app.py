@@ -209,6 +209,9 @@ def create_dashboard_view():
             html.Span("Dashboard", className="breadcrumb-item active"),
         ]),
         
+        # Notification banner (auto-dismisses after 3 seconds)
+        html.Div(id='notification-banner', className='notification-banner', style={'display': 'none'}),
+        
         # Main dashboard grid
         html.Div(className='dashboard-grid', children=[
             # Left column - Quick actions and status
@@ -229,6 +232,7 @@ def create_dashboard_view():
                     html.Div(style={'display': 'flex', 'flexDirection': 'column', 'gap': '6px'}, children=[
                         dbc.Button("Start Tuner", id='start-tuner-btn', className="btn-primary", style={'width': '100%', 'padding': '8px', 'fontSize': '13px'}),
                         dbc.Button("Stop Tuner", id='stop-tuner-btn', className="btn-danger", style={'width': '100%', 'padding': '8px', 'fontSize': '13px'}),
+                        html.Div(id='tuner-status-indicator', style={'fontSize': '11px', 'textAlign': 'center', 'padding': '4px', 'color': 'var(--text-secondary)'}),
                         dbc.Button("Run Optimization", id='run-optimization-btn', className="btn-primary", style={'width': '100%', 'padding': '8px', 'fontSize': '13px'}),
                         dbc.Button("Skip Coefficient", id='skip-coefficient-btn', className="btn-secondary", style={'width': '100%', 'padding': '8px', 'fontSize': '13px'}),
                     ])
@@ -258,7 +262,7 @@ def create_dashboard_view():
                 ]),
             ]),
             
-            # Right column - Navigation and fine tuning
+            # Right column - Navigation and shot recording
             html.Div([
                 # Coefficient navigation
                 html.Div(className="card", style={'marginBottom': '12px'}, children=[
@@ -266,16 +270,6 @@ def create_dashboard_view():
                     html.Div(style={'display': 'flex', 'gap': '8px'}, children=[
                         dbc.Button("◀ Previous", id='prev-coeff-btn', className="btn-secondary", style={'flex': '1', 'padding': '8px', 'fontSize': '13px'}),
                         dbc.Button("Next ▶", id='next-coeff-btn', className="btn-secondary", style={'flex': '1', 'padding': '8px', 'fontSize': '13px'}),
-                    ])
-                ]),
-                
-                # Fine tuning controls
-                html.Div(className="card", style={'marginBottom': '12px'}, children=[
-                    html.Div("Fine Tuning Controls", className="card-header"),
-                    html.Div(style={'display': 'flex', 'flexDirection': 'row', 'gap': '8px', 'justifyContent': 'center'}, children=[
-                        dbc.Button("⬆ Up", id='fine-tune-up-btn', className="btn-secondary", style={'flex': '1', 'maxWidth': '100px', 'padding': '6px', 'fontSize': '13px'}),
-                        dbc.Button("Reset", id='fine-tune-reset-btn', className="btn-secondary", style={'flex': '1', 'maxWidth': '100px', 'padding': '6px', 'fontSize': '13px'}),
-                        dbc.Button("⬇ Down", id='fine-tune-down-btn', className="btn-secondary", style={'flex': '1', 'maxWidth': '100px', 'padding': '6px', 'fontSize': '13px'}),
                     ])
                 ]),
                 
@@ -676,24 +670,35 @@ def create_graphs_view():
 
 
 def create_workflow_view():
-    """Create the order & workflow management view."""
+    """Create the order & workflow management view with all 7 coefficients properly displayed."""
+    # All 7 coefficient names
+    coefficient_names = [
+        'kDragCoefficient',
+        'kGravity',
+        'kShotHeight',
+        'kTargetHeight',
+        'kShooterAngle',
+        'kShooterRPM',
+        'kExitVelocity'
+    ]
+    
     return html.Div([
         # Tuning Order Management
         html.Div(className="card", children=[
             html.Div("Tuning Order & Sequence", className="card-header"),
-            html.P("Drag to reorder, click to enable/disable coefficients in the tuning sequence"),
+            html.P("Drag to reorder, toggle to enable/disable", style={'color': 'var(--text-secondary)', 'marginBottom': '8px'}),
             html.Div(id='tuning-order-list', children=[
-                html.Div(className="card", style={'marginBottom': '8px', 'cursor': 'move', 'padding': '12px'}, children=[
+                html.Div(className="card", style={'marginBottom': '8px', 'cursor': 'move', 'padding': '12px', 'backgroundColor': '#f6f8fa'}, children=[
                     html.Div(style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'}, children=[
                         html.Div([
-                            html.Span("1. ", style={'fontWeight': 'bold', 'marginRight': '8px'}),
-                            html.Span("kDragCoefficient"),
+                            html.Span(f"{i+1}. ", style={'fontWeight': 'bold', 'marginRight': '8px'}),
+                            html.Span(coeff_name),
                         ]),
                         html.Div(style={'display': 'flex', 'gap': '8px'}, children=[
-                            dbc.Button("⬆", id={'type': 'move-up', 'index': 0}, size="sm", className="btn-secondary"),
-                            dbc.Button("⬇", id={'type': 'move-down', 'index': 0}, size="sm", className="btn-secondary"),
+                            dbc.Button("⬆", id={'type': 'move-up', 'index': i}, size="sm", className="btn-secondary"),
+                            dbc.Button("⬇", id={'type': 'move-down', 'index': i}, size="sm", className="btn-secondary"),
                             dbc.Checklist(
-                                id={'type': 'enable-coeff', 'index': 0},
+                                id={'type': 'enable-coeff', 'index': i},
                                 options=[{'label': 'Enabled', 'value': 'enabled'}],
                                 value=['enabled'],
                                 switch=True,
@@ -701,7 +706,7 @@ def create_workflow_view():
                             ),
                         ])
                     ])
-                ]) for i in range(7)
+                ]) for i, coeff_name in enumerate(coefficient_names)
             ])
         ]),
         
@@ -723,19 +728,19 @@ def create_workflow_view():
                 html.Div(style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr', 'gap': '16px'}, children=[
                     html.Div([
                         html.Label("Current Coefficient:", style={'fontWeight': 'bold'}),
-                        html.P("kDragCoefficient", id='current-coeff-display')
+                        html.P(app_state.get('current_coefficient', 'kDragCoefficient'), id='current-coeff-display')
                     ]),
                     html.Div([
                         html.Label("Progress:", style={'fontWeight': 'bold'}),
-                        html.P("1 of 7 (14%)", id='workflow-progress-display')
+                        html.P("Not started", id='workflow-progress-display')
                     ]),
                     html.Div([
                         html.Label("Shots Collected:", style={'fontWeight': 'bold'}),
-                        html.P("5 / 10", id='shots-collected-display')
+                        html.P(f"{app_state.get('shot_count', 0)} shots", id='shots-collected-display')
                     ]),
                     html.Div([
-                        html.Label("Estimated Time Remaining:", style={'fontWeight': 'bold'}),
-                        html.P("~25 minutes", id='time-remaining-display')
+                        html.Label("Success Rate:", style={'fontWeight': 'bold'}),
+                        html.P(f"{app_state.get('success_rate', 0.0):.1%}", id='time-remaining-display')
                     ]),
                 ])
             ])
@@ -746,20 +751,15 @@ def create_workflow_view():
             html.Div("Backtrack to Previous Coefficients", className="card-header"),
             html.P("Re-tune coefficients that may have been affected by later changes", style={'color': 'var(--text-secondary)'}),
             html.Div(style={'display': 'flex', 'gap': '8px', 'flexWrap': 'wrap'}, children=[
-                dbc.Button("← kDragCoefficient", id={'type': 'backtrack', 'index': 'kDragCoefficient'}, className="btn-secondary", size="sm"),
-                dbc.Button("← kGravity", id={'type': 'backtrack', 'index': 'kGravity'}, className="btn-secondary", size="sm"),
-                dbc.Button("← kShotHeight", id={'type': 'backtrack', 'index': 'kShotHeight'}, className="btn-secondary", size="sm"),
-                dbc.Button("← kTargetHeight", id={'type': 'backtrack', 'index': 'kTargetHeight'}, className="btn-secondary", size="sm"),
-                dbc.Button("← kShooterAngle", id={'type': 'backtrack', 'index': 'kShooterAngle'}, className="btn-secondary", size="sm"),
-                dbc.Button("← kShooterRPM", id={'type': 'backtrack', 'index': 'kShooterRPM'}, className="btn-secondary", size="sm"),
-                dbc.Button("← kExitVelocity", id={'type': 'backtrack', 'index': 'kExitVelocity'}, className="btn-secondary", size="sm"),
+                dbc.Button(f"← {coeff_name}", id={'type': 'backtrack', 'index': coeff_name}, className="btn-secondary", size="sm")
+                for coeff_name in coefficient_names
             ])
         ]),
         
         # Coefficient Interactions
         html.Div(className="card", children=[
             html.Div("Detected Coefficient Interactions", className="card-header"),
-            html.P("Automatically detected dependencies between coefficients", style={'color': 'var(--text-secondary)'}),
+            html.P("Interactions will appear here once real data is collected", style={'color': 'var(--text-secondary)'}),
             html.Div(id='interactions-display', children=[
                 html.Table(className="table-github", children=[
                     html.Thead([
@@ -772,23 +772,8 @@ def create_workflow_view():
                     ]),
                     html.Tbody([
                         html.Tr([
-                            html.Td("kShooterAngle"),
-                            html.Td("kExitVelocity"),
-                            html.Td(html.Div(style={'width': '100px', 'height': '20px', 'background': 'linear-gradient(to right, #1a7f37 80%, #e8e8e8 80%)'}, title="80% correlation")),
-                            html.Td("Tune together")
-                        ]),
-                        html.Tr([
-                            html.Td("kDragCoefficient"),
-                            html.Td("kExitVelocity"),
-                            html.Td(html.Div(style={'width': '100px', 'height': '20px', 'background': 'linear-gradient(to right, #FF8C00 60%, #e8e8e8 60%)'}, title="60% correlation")),
-                            html.Td("Consider re-tuning")
-                        ]),
-                        html.Tr([
-                            html.Td("kShotHeight"),
-                            html.Td("kTargetHeight"),
-                            html.Td(html.Div(style={'width': '100px', 'height': '20px', 'background': 'linear-gradient(to right, #9a6700 40%, #e8e8e8 40%)'}, title="40% correlation")),
-                            html.Td("Monitor")
-                        ]),
+                            html.Td("No interactions detected yet", colSpan=4, style={'fontStyle': 'italic', 'color': 'var(--text-secondary)', 'textAlign': 'center'})
+                        ])
                     ])
                 ])
             ])
@@ -799,7 +784,7 @@ def create_workflow_view():
             html.Div("Tuning Session Management", className="card-header"),
             html.Div([
                 html.Label("Session Name:", style={'fontWeight': 'bold'}),
-                dbc.Input(type="text", value=f"Tuning session {datetime.now().strftime('%m/%d/%Y at %H:%M')}", id='session-name', placeholder="Enter session name"),
+                dbc.Input(type="text", value="", id='session-name', placeholder="Enter session name"),
                 html.Br(),
                 html.Label("Session Notes:", style={'fontWeight': 'bold'}),
                 dbc.Textarea(id='session-notes', placeholder="Notes about this tuning session...", style={'height': '100px'}),
@@ -1001,59 +986,6 @@ def create_robot_status_view():
                     html.Div(f"[{datetime.now().strftime('%H:%M:%S')}] NetworkTables not connected", style={'color': 'var(--warning)'}),
                 ]
             )
-        ]),
-        
-        # Robot diagnostics
-        html.Div(className="card", children=[
-            html.Div("🔧 Robot Diagnostics", className="card-header"),
-            html.Table(className="table-github", children=[
-                html.Thead([
-                    html.Tr([
-                        html.Th("Component"),
-                        html.Th("Status"),
-                        html.Th("Temperature"),
-                        html.Th("Current Draw"),
-                        html.Th("Errors"),
-                    ])
-                ]),
-                html.Tbody([
-                    html.Tr([
-                        html.Td("Left Drive Motor"),
-                        html.Td([html.Span("●", style={'color': 'var(--success)'}), " OK"]),
-                        html.Td("42°C"),
-                        html.Td("3.2A"),
-                        html.Td("0"),
-                    ]),
-                    html.Tr([
-                        html.Td("Right Drive Motor"),
-                        html.Td([html.Span("●", style={'color': 'var(--success)'}), " OK"]),
-                        html.Td("41°C"),
-                        html.Td("3.1A"),
-                        html.Td("0"),
-                    ]),
-                    html.Tr([
-                        html.Td("Shooter Motor"),
-                        html.Td([html.Span("●", style={'color': 'var(--warning)'}), " Warm"]),
-                        html.Td("58°C"),
-                        html.Td("12.4A"),
-                        html.Td("0"),
-                    ]),
-                    html.Tr([
-                        html.Td("Intake Motor"),
-                        html.Td([html.Span("●", style={'color': 'var(--success)'}), " OK"]),
-                        html.Td("38°C"),
-                        html.Td("2.1A"),
-                        html.Td("0"),
-                    ]),
-                    html.Tr([
-                        html.Td("Pneumatics"),
-                        html.Td([html.Span("●", style={'color': 'var(--danger)'}), " No Data"]),
-                        html.Td("--"),
-                        html.Td("--"),
-                        html.Td("1"),
-                    ]),
-                ])
-            ])
         ]),
     ])
 
@@ -1410,8 +1342,15 @@ def toggle_sidebar(n_clicks, current_class):
 # Button Callback Functions
 # ============================================================================
 
+# Cache style dict for status indicator - microoptimization
+_STATUS_BASE_STYLE = {'fontSize': '11px', 'textAlign': 'center', 'padding': '4px', 'color': 'var(--text-secondary)'}
+
 @app.callback(
-    Output('app-state', 'data', allow_duplicate=True),
+    [Output('app-state', 'data', allow_duplicate=True),
+     Output('tuner-status-indicator', 'children'),
+     Output('tuner-status-indicator', 'style'),
+     Output('notification-banner', 'children'),
+     Output('notification-banner', 'className')],
     [Input('start-tuner-btn', 'n_clicks'),
      Input('stop-tuner-btn', 'n_clicks'),
      Input('run-optimization-btn', 'n_clicks'),
@@ -1423,43 +1362,77 @@ def handle_core_control_buttons(start_clicks, stop_clicks, run_clicks, skip_clic
     """Handle core control button clicks and actually control the tuner."""
     ctx = callback_context
     if not ctx.triggered:
-        return state
+        return state, "", _STATUS_BASE_STYLE.copy(), "", "notification-banner"
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    status_message = ""
+    status_style = _STATUS_BASE_STYLE.copy()
+    banner_message = ""
+    banner_class = "notification-banner"
     
     if button_id == 'start-tuner-btn':
         state['tuner_enabled'] = True
         print("✅ Tuner Started")
+        status_message = "✓ Tuner Started"
+        status_style['color'] = 'var(--success)'
+        banner_message = "Tuner Started"
+        banner_class = "notification-banner notification-banner-visible notification-banner-success"
         if tuner_coordinator:
             try:
                 tuner_coordinator.start()
                 print("✓ Tuner coordinator thread started")
             except Exception as e:
                 print(f"Error starting tuner: {e}")
+                status_message = f"⚠️ Error: {str(e)[:30]}"
+                status_style['color'] = 'var(--danger)'
+                banner_message = f"Error: {str(e)[:50]}"
+                banner_class = "notification-banner notification-banner-visible notification-banner-danger"
         
     elif button_id == 'stop-tuner-btn':
         state['tuner_enabled'] = False
         print("⛔ Tuner Stopped")
+        status_message = "✓ Tuner Stopped"
+        status_style['color'] = 'var(--danger)'
+        banner_message = "Tuner Stopped"
+        banner_class = "notification-banner notification-banner-visible notification-banner-danger"
         if tuner_coordinator:
             try:
                 tuner_coordinator.stop()
                 print("✓ Tuner coordinator thread stopped")
             except Exception as e:
                 print(f"Error stopping tuner: {e}")
+                status_message = f"⚠️ Error: {str(e)[:30]}"
+                status_style['color'] = 'var(--danger)'
+                banner_message = f"Error: {str(e)[:50]}"
+                banner_class = "notification-banner notification-banner-visible notification-banner-danger"
         
     elif button_id == 'run-optimization-btn':
         print("🔄 Running Optimization...")
+        status_message = "🔄 Optimization running..."
+        status_style['color'] = 'var(--primary)'
+        banner_message = "Optimization Reset"
+        banner_class = "notification-banner notification-banner-visible notification-banner-warning"
         if tuner_coordinator:
             try:
                 tuner_coordinator.trigger_optimization()
                 print("✓ Optimization triggered")
+                status_message = "✓ Optimization triggered"
+                status_style['color'] = 'var(--success)'
             except Exception as e:
                 print(f"Error triggering optimization: {e}")
+                status_message = f"⚠️ Error: {str(e)[:30]}"
+                status_style['color'] = 'var(--danger)'
+                banner_message = f"Error: {str(e)[:50]}"
+                banner_class = "notification-banner notification-banner-visible notification-banner-danger"
         else:
             print("⚠️ Tuner not available - running in demo mode")
+            status_message = "⚠️ Demo mode"
+            status_style['color'] = 'var(--warning)'
         
     elif button_id == 'skip-coefficient-btn':
         print("⏭️ Skipping to Next Coefficient")
+        banner_message = "Coefficient Reset"
+        banner_class = "notification-banner notification-banner-visible notification-banner-warning"
         if tuner_coordinator and tuner_coordinator.optimizer:
             try:
                 tuner_coordinator.optimizer.advance_to_next_coefficient()
@@ -1468,12 +1441,20 @@ def handle_core_control_buttons(start_clicks, stop_clicks, run_clicks, skip_clic
                 if current_coeff:
                     state['current_coefficient'] = current_coeff
                 print(f"✓ Advanced to next coefficient: {current_coeff}")
+                status_message = f"✓ Skipped to {current_coeff}"
+                status_style['color'] = 'var(--success)'
             except Exception as e:
                 print(f"Error skipping coefficient: {e}")
+                status_message = f"⚠️ Error: {str(e)[:30]}"
+                status_style['color'] = 'var(--danger)'
+                banner_message = f"Error: {str(e)[:50]}"
+                banner_class = "notification-banner notification-banner-visible notification-banner-danger"
         else:
             print("⚠️ Tuner not available - running in demo mode")
+            status_message = "⚠️ Tuner not available"
+            status_style['color'] = 'var(--warning)'
     
-    return state
+    return state, status_message, status_style, banner_message, banner_class
 
 
 @app.callback(
@@ -2287,6 +2268,11 @@ def update_dashboard_displays(state):
     return coeff, str(shots), f"{success:.1%}"
 
 
+# Cache style dicts for robot status - microoptimization to avoid recreating dicts
+_NA_STYLE = {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--text-secondary)'}
+_SUCCESS_STYLE = {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'}
+_INFO_STYLE = {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--info)'}
+
 @app.callback(
     [Output('robot-battery', 'children'),
      Output('robot-battery', 'style'),
@@ -2305,23 +2291,22 @@ def update_robot_status_displays(state):
     connection_status = state.get('connection_status', 'disconnected')
     
     if connection_status == 'disconnected' or not connection_status or connection_status == '':
-        # Robot is disconnected - show N/A for all values
-        na_style = {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--text-secondary)'}
+        # Robot is disconnected - show N/A for all values (use cached style)
         return (
-            "N/A", na_style,
-            "N/A", na_style,
-            "N/A", na_style,
-            "N/A", na_style,
-            "N/A", na_style
+            "N/A", _NA_STYLE,
+            "N/A", _NA_STYLE,
+            "N/A", _NA_STYLE,
+            "N/A", _NA_STYLE,
+            "N/A", _NA_STYLE
         )
     else:
-        # Robot is connected - show actual values (placeholder for now)
+        # Robot is connected - show actual values (use cached styles)
         return (
-            "12.4V", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'},
-            "34%", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--info)'},
-            "128MB", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--info)'},
-            "42%", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'},
-            "18ms", {'fontSize': '24px', 'fontWeight': '600', 'color': 'var(--success)'}
+            "12.4V", _SUCCESS_STYLE,
+            "34%", _INFO_STYLE,
+            "128MB", _INFO_STYLE,
+            "42%", _SUCCESS_STYLE,
+            "18ms", _SUCCESS_STYLE
         )
 
 
@@ -2331,7 +2316,8 @@ def update_robot_status_displays(state):
      Output('status-bar-shots', 'children'),
      Output('status-bar-success', 'children')],
     [Input('update-interval', 'n_intervals')],
-    [State('app-state', 'data')]
+    [State('app-state', 'data')],
+    prevent_initial_call=True
 )
 def update_status_bar(n_intervals, state):
     """Update the status bar with current time and stats."""
@@ -2357,6 +2343,26 @@ app.clientside_callback(
     [Output('status-bar-time', 'children', allow_duplicate=True),
      Output('status-bar-date', 'children', allow_duplicate=True)],
     [Input('update-interval', 'n_intervals')],
+    prevent_initial_call=True
+)
+
+# Auto-dismiss notification banner after 3 seconds
+app.clientside_callback(
+    """
+    function(className) {
+        if (className && className.includes('notification-banner-visible')) {
+            setTimeout(function() {
+                const banner = document.getElementById('notification-banner');
+                if (banner) {
+                    banner.className = 'notification-banner';
+                }
+            }, 3000);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output('notification-banner', 'id', allow_duplicate=True),
+    [Input('notification-banner', 'className')],
     prevent_initial_call=True
 )
 
